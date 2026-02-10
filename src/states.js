@@ -1,0 +1,13 @@
+const GameState = {
+  INTRO: "INTRO",
+  STORY: "STORY",
+  LOGIN: "LOGIN",
+  MAIN_PAGE: "MAIN_PAGE",
+
+  WTG: "WTG",
+  BESS: "BESS",
+  SOLAR: "SOLAR",
+  SUBSTATION: "SUBSTATION",
+
+  ASSET_INVENTORY: "ASSET_INVENTORY" // 👈 YENİ
+};

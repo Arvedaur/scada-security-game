@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SCADA Cyber Defender - Terminal</title>
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #gameContainer {
+            width: 960px;
+            height: 540px;
+            position: relative;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+    </div>
+
+    <script src="src/states.js"></script>
+    <script src="src/intro.js"></script>
+    <script src="src/story.js"></script>
+    <script src="src/mainPage.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
