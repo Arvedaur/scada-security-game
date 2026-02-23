@@ -1,9 +1,77 @@
 
 const AccessPhase = {
-    configuredAssets: new Set(),
+    generatedRequests: {}, // assetId -> Array of requests
+    processedAssets: new Set(),
 
     init() {
-        this.configuredAssets.clear();
+        this.generatedRequests = {};
+        this.processedAssets.clear();
+
+        // Generate mock requests for each asset
+        player.inventory.forEach(asset => {
+            this.generatedRequests[asset.id] = this.generateRequestsForAsset(asset);
+        });
+    },
+
+    generateRequestsForAsset(asset) {
+        // Generate 1-3 requests pending for this asset
+        const requests = [];
+        const count = Math.floor(Math.random() * 3) + 1;
+
+        const roles = ["Operator", "Engineer", "Site Manager", "Accountant", "Animal Trainer"];
+        const levels = ["Read-Only", "Write", "Admin"];
+
+        for (let i = 0; i < count; i++) {
+            // Randomize
+            const role = roles[Math.floor(Math.random() * roles.length)];
+            const level = levels[Math.floor(Math.random() * levels.length)];
+
+            // Generate Name + Email
+            const fnames = ["john", "jane", "alice", "bob", "ev", "mallory", "charlie"];
+            const lnames = ["doe", "smith", "hacker", "white", "black", "admin"];
+            const fn = fnames[Math.floor(Math.random() * fnames.length)];
+            const ln = lnames[Math.floor(Math.random() * lnames.length)];
+            const domains = ["company.com", "partner.org", "unknown.net", "hacker.site"];
+            const domain = domains[Math.floor(Math.random() * domains.length)];
+
+            // Format check (sometimes invalid format)
+            let email = `${fn}.${ln}@${domain}`;
+            if (Math.random() > 0.9) email = `${fn}_${ln}123`; // Bad format
+
+            // Determine if Valid Request
+            let isValid = true;
+            let violationReason = "";
+
+            // 1. Email Format
+            if (!/^[a-zA-Z]+\.[a-zA-Z]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                isValid = false;
+                violationReason = "Invalid Email Format";
+            }
+            // 2. Bad Domain (optional logic, simplifed here to just format/role)
+
+            // 3. Bad Role
+            if (role === "Accountant" || role === "Animal Trainer") {
+                isValid = false;
+                violationReason += " Unauthorized Role";
+            }
+
+            // 4. Bad Access Level
+            if ((level === "Write" || level === "Admin") && (role !== "Engineer" && role !== "Site Manager")) {
+                isValid = false;
+                violationReason += " Excessive Privileges";
+            }
+
+            requests.push({
+                id: `REQ-${Math.floor(Math.random() * 1000)}`,
+                email: email,
+                role: role,
+                level: level,
+                isValid: isValid,
+                violationReason: violationReason.trim(),
+                processed: false
+            });
+        }
+        return requests;
     },
 
     render() {
@@ -13,66 +81,74 @@ const AccessPhase = {
 
         const panel = document.createElement("div");
         panel.className = "panel";
-        panel.style.display = "flex";
-        panel.style.flexDirection = "column";
-        panel.style.gap = "20px";
 
-        // Header
+        // HEADER
         const header = document.createElement("div");
+        header.className = "panel-header";
         header.innerHTML = `
-            <h2>ACCESS MANAGEMENT</h2>
-            <p>Create accounts for each asset. Only authorized roles (Engineer/Site Manager) can have WRITE access.</p>
-            <p>Restricted Roles: Accountant, Animal Trainer.</p>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">ACCESS MANAGEMENT REVIEW</h2>
+                <h2 style="margin:0; color:#bb0000;">SCORE: ${player.score}</h2>
+            </div>
+            <p>Review pending access requests. Approve legitimate users (Engineer/Site Manager) with valid emails. Reject violations.</p>
         `;
         panel.appendChild(header);
 
-        // Content Container (Split View)
-        const container = document.createElement("div");
-        container.style.display = "flex";
-        container.style.gap = "20px";
-        container.style.height = "400px";
+        // CONTENT
+        const content = document.createElement("div");
+        content.className = "panel-content";
+        content.style.display = "flex";
+        content.style.flexDirection = "row";
+        content.style.padding = "0";
 
         // Left: Asset List
         const assetList = document.createElement("div");
         assetList.style.flex = "1";
-        assetList.style.border = "1px solid #00bb00";
+        assetList.style.borderRight = "1px solid #00bb00";
         assetList.style.padding = "10px";
         assetList.style.overflowY = "auto";
-        assetList.innerHTML = "<h3>Target Systems</h3>";
+        assetList.innerHTML = "<h3>Pending Reviews</h3>";
 
-        // Right: Access Form
-        const accessForm = document.createElement("div");
-        accessForm.style.flex = "2";
-        accessForm.style.border = "1px solid #00bb00";
-        accessForm.style.padding = "20px";
-        accessForm.innerHTML = "<h3>User Configuration</h3><p>Select a system to configure access.</p>";
+        // Right View
+        const details = document.createElement("div");
+        details.style.flex = "2";
+        details.style.padding = "20px";
+        details.innerHTML = "<h3>Request Queue</h3><p>Select a system to review requests.</p>";
 
         player.inventory.forEach(asset => {
+            const reqs = this.generatedRequests[asset.id];
+            const pendingCount = reqs.filter(r => !r.processed).length;
+
             const btn = document.createElement("button");
             btn.style.width = "100%";
             btn.style.textAlign = "left";
-            btn.innerText = `${this.configuredAssets.has(asset.id) ? "[LOCKED]" : "[OPEN]"} ${asset.name}`;
-            if (this.configuredAssets.has(asset.id)) btn.style.color = "#555";
+            btn.innerText = `${pendingCount === 0 ? "[DONE]" : "[PENDING]"} ${asset.name} (${pendingCount})`;
+            if (pendingCount === 0) btn.style.color = "#555";
 
             btn.onclick = () => {
-                if (this.configuredAssets.has(asset.id)) return;
-                this.renderAccessForm(asset, accessForm);
+                this.renderRequestList(asset, details);
             };
             assetList.appendChild(btn);
         });
 
-        container.appendChild(assetList);
-        container.appendChild(accessForm);
-        panel.appendChild(container);
+        content.appendChild(assetList);
+        content.appendChild(details);
+        panel.appendChild(content);
 
-        // Footer: Proceed Button
+        // FOOTER
         const footer = document.createElement("div");
-        footer.style.textAlign = "center";
+        footer.className = "panel-footer";
         const proceedBtn = document.createElement("button");
         proceedBtn.innerText = "PROCEED TO BCM / DR >>";
         proceedBtn.onclick = () => {
-            if (this.configuredAssets.size < player.inventory.length) {
-                if (!confirm("Warning: Not all systems have configured access controls. Proceed?")) return;
+            // Check if all processed?
+            let allDone = true;
+            Object.values(this.generatedRequests).flat().forEach(r => {
+                if (!r.processed) allDone = false;
+            });
+
+            if (!allDone) {
+                if (!confirm("Warning: You have unprocessed requests. Unreviewed requests will be auto-rejected. Proceed?")) return;
             }
             currentState = GameState.BCM_DR;
             ui.classList.add("hidden");
@@ -83,97 +159,101 @@ const AccessPhase = {
         ui.appendChild(panel);
     },
 
-    renderAccessForm(asset, container) {
-        container.innerHTML = `<h3>Configuring: ${asset.name}</h3>`;
+    renderRequestList(asset, container) {
+        container.innerHTML = `<h3>Requests for ${asset.name}</h3>`;
 
-        const form = document.createElement("div");
-        form.style.display = "flex";
-        form.style.flexDirection = "column";
-        form.style.gap = "15px";
-        form.style.maxWidth = "400px";
+        const requests = this.generatedRequests[asset.id];
 
-        // Email Input
-        const emailDiv = document.createElement("div");
-        emailDiv.innerHTML = `<label>User Email (Personal):</label><br>`;
-        const emailInput = document.createElement("input");
-        emailInput.type = "text";
-        emailInput.placeholder = "user@example.com";
-        emailInput.style.width = "100%";
-        emailDiv.appendChild(emailInput);
-        form.appendChild(emailDiv);
+        if (requests.length === 0) {
+            container.innerHTML += "<p>No pending requests.</p>";
+            return;
+        }
 
-        // Role Select
-        const roleDiv = document.createElement("div");
-        roleDiv.innerHTML = `<label>Role:</label><br>`;
-        const roleSelect = document.createElement("select");
-        roleSelect.style.width = "100%";
-        ["Operator", "Engineer", "Site Manager", "Accountant", "Animal Trainer"].forEach(r => {
-            const opt = document.createElement("option");
-            opt.value = r;
-            opt.innerText = r;
-            roleSelect.appendChild(opt);
+        requests.forEach(req => {
+            if (req.processed) return; // Don't show processed ones? Or show them disabled.
+
+            const card = document.createElement("div");
+            card.style.border = "1px solid #00bb00";
+            card.style.padding = "10px";
+            card.style.marginBottom = "10px";
+
+            card.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px;">User: ${req.email}</div>
+                <div style="font-size: 0.9em; margin-bottom: 10px;">
+                    Role: ${req.role} | Level: ${req.level}
+                </div>
+            `;
+
+            const btnRow = document.createElement("div");
+            btnRow.style.display = "flex";
+            btnRow.style.gap = "10px";
+
+            const approveBtn = document.createElement("button");
+            approveBtn.innerText = "APPROVE";
+            approveBtn.style.borderColor = "#00ff00";
+            approveBtn.style.color = "#00ff00";
+            approveBtn.onclick = () => this.processRequest(req, true, asset);
+
+            const rejectBtn = document.createElement("button");
+            rejectBtn.innerText = "REJECT";
+            rejectBtn.style.borderColor = "#ff0000";
+            rejectBtn.style.color = "#ff0000";
+            rejectBtn.onclick = () => this.processRequest(req, false, asset);
+
+            btnRow.appendChild(approveBtn);
+            btnRow.appendChild(rejectBtn);
+            card.appendChild(btnRow);
+
+            container.appendChild(card);
         });
-        roleDiv.appendChild(roleSelect);
-        form.appendChild(roleDiv);
 
-        // Access Level Select
-        const levelDiv = document.createElement("div");
-        levelDiv.innerHTML = `<label>Access Level:</label><br>`;
-        const levelSelect = document.createElement("select");
-        levelSelect.style.width = "100%";
-        ["Read-Only", "Write", "Admin"].forEach(l => {
-            const opt = document.createElement("option");
-            opt.value = l;
-            opt.innerText = l;
-            levelSelect.appendChild(opt);
-        });
-        levelDiv.appendChild(levelSelect);
-        form.appendChild(levelDiv);
-
-        // Submit Button
-        const submitBtn = document.createElement("button");
-        submitBtn.innerText = "GRANT ACCESS";
-        submitBtn.style.marginTop = "20px";
-        submitBtn.onclick = () => {
-            this.validateAndSubmit(asset, emailInput.value, roleSelect.value, levelSelect.value);
-        };
-        form.appendChild(submitBtn);
-
-        container.appendChild(form);
+        if (requests.filter(r => !r.processed).length === 0) {
+            container.innerHTML += "<p>All requests processed.</p>";
+        }
     },
 
-    validateAndSubmit(asset, email, role, level) {
-        // 1. Email Check (Personal Email)
-        // Simple regex for email structure + check for not being a corporate domain if needed? 
-        // Prompt says "must be personal e mail address". I'll check generic structure for now + maybe blacklist 'company.com'?
-        // Actually, let's just enforce it looks like an email.
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert("ERROR: Invalid Email Format.");
-            return;
+    processRequest(req, approved, asset) {
+        req.processed = true;
+
+        let points = 0;
+        let msg = "";
+        let incidentValue = "";
+
+        if (approved) {
+            if (req.isValid) {
+                points = 20;
+                msg = "APPROVED: Access Granted to Valid User.";
+            } else {
+                points = -20;
+                msg = `VIOLATION: Granted Access to Invalid Request.`;
+                incidentValue = `Granted Unauthorized Access to ${req.email}`;
+
+                // Why?
+                msg += `\n\nWHY IT MATTERS: ${req.violationReason}`;
+                if (req.violationReason.includes("Excessive Privileges")) {
+                    msg += "\n\nPRINCIPLE OF LEAST PRIVILEGE: Users should only have the bare minimum access rights needed for their job.";
+                }
+            }
+        } else {
+            // Rejected
+            if (req.isValid) {
+                points = -10;
+                msg = "WARNING: Rejected Valid User request.";
+                incidentValue = `Rejected Valid User ${req.email}`;
+                msg += "\n\nWHY IT MATTERS: Blocking legitimate engineers disrupts operations (Availability impact).";
+            } else {
+                points = 20;
+                msg = "BLOCKED: Successfully prevented unauthorized access.";
+            }
         }
 
-        // 2. Role Check
-        if (role === "Accountant" || role === "Animal Trainer") {
-            alert(`SECURITY VIOLATION: Role '${role}' is not authorized for OT Access.`);
-            player.score -= 20;
-            return;
-        }
+        player.score += points;
+        player.phaseScores.access += points;
 
-        // 3. Access Level Check
-        // Level cannot be WRITE unless Engineer or Site Manager
-        // (Assuming Admin also needs high privs, but prompt only mentions Write specifically? "access level cannot be write access unless...")
-        // I will assume Admin is also restricted similarly or Admin IS Write+.
-        if ((level === "Write" || level === "Admin") && (role !== "Engineer" && role !== "Site Manager")) {
-            alert(`SECURITY VIOLATION: Role '${role}' cannot hold '${level}' privileges.`);
-            player.score -= 20;
-            return;
-        }
+        if (incidentValue) player.incidents.push(incidentValue);
 
-        // Success
-        alert(`ACCESS GRANTED: User '${email}' added to ${asset.name}.`);
-        player.score += 40;
-        this.configuredAssets.add(asset.id);
-        this.render(); // Redraw to update list
+        alert(`${msg} (${points > 0 ? '+' : ''}${points} PTS)`);
+
+        this.render(); // Redraw
     }
 };

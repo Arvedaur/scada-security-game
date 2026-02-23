@@ -14,10 +14,23 @@ let mouseX = 0, mouseY = 0;
 let loginInput = "";
 
 // Player State
+// Player State
 const player = {
     name: "",
     score: 0,
-    inventory: []
+    inventory: [],
+    progress: {
+        inventory: false,
+        patching: false,
+        access: false
+    },
+    phaseScores: {
+        inventory: 0,
+        patching: 0,
+        access: 0,
+        bcm: 0
+    },
+    incidents: []
 };
 
 // --- ASSETS & DATA ---
@@ -130,11 +143,11 @@ function renderLogin() {
     ctx.fillText("AUTHENTICATION REQUIRED", canvas.width / 2, 200);
 
     ctx.fillStyle = "#fff";
-    ctx.fillText("ENTER ACCESS CODE: " + loginInput + (Date.now() % 1000 < 500 ? "_" : " "), canvas.width / 2, 270);
+    ctx.fillText("TYPE YOUR USERNAME: " + loginInput + (Date.now() % 1000 < 500 ? "_" : " "), canvas.width / 2, 270);
 
     ctx.fillStyle = "#555";
     ctx.font = "14px monospace";
-    ctx.fillText("(TYPE NAME & PRESS ENTER)", canvas.width / 2, 320);
+    ctx.fillText("(TYPE USERNAME & PRESS ENTER)", canvas.width / 2, 320);
 }
 
 function renderPlaceholderScreen(title, subtitle) {
@@ -233,6 +246,8 @@ function renderGenericSubPage(key) {
 
 // --- INPUT HANDLING ---
 
+// --- INPUT HANDLING ---
+
 window.addEventListener("keydown", (e) => {
     // Global ESC
     if (e.key === "Escape") {
@@ -243,10 +258,31 @@ window.addEventListener("keydown", (e) => {
     }
 
     if (currentState === GameState.INTRO) {
-        currentState = GameState.STORY;
+        if (e.code === "Space") {
+            if (typeof introState !== 'undefined' && introState.complete) {
+                currentState = GameState.STORY;
+                initStory(); // RESET STORY
+            } else {
+                // Skip animation
+                if (typeof introState !== 'undefined') {
+                    introState.currentLine = introState.lines.length;
+                    introState.complete = true;
+                }
+            }
+        }
     }
     else if (currentState === GameState.STORY) {
-        currentState = GameState.LOGIN;
+        if (e.key === "Enter") {
+            if (typeof storyState !== 'undefined' && storyState.complete) {
+                currentState = GameState.LOGIN;
+            } else {
+                // Skip animation
+                if (typeof storyState !== 'undefined') {
+                    storyState.currentLine = storyState.lines.length;
+                    storyState.complete = true;
+                }
+            }
+        }
     }
     else if (currentState === GameState.LOGIN) {
         if (e.key === "Enter") {
@@ -262,8 +298,10 @@ window.addEventListener("keydown", (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
     const rect = canvas.getBoundingClientRect();
-    mouseX = e.clientX - rect.left;
-    mouseY = e.clientY - rect.top;
+    // Correct mouse position: (Client - RectLeft) * (InternalWidth / RectWidth)
+    // This works regardless of CSS transform scale
+    mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
 });
 
 canvas.addEventListener("click", () => {
@@ -278,6 +316,11 @@ canvas.addEventListener("click", () => {
     if (currentState !== GameState.INTRO && currentState !== GameState.STORY && currentState !== GameState.LOGIN) {
         navButtons.forEach(btn => {
             if (isInside(btn, mouseX, mouseY)) {
+                // Progression Check
+                if (btn.id === "PATCH" && !player.progress.inventory) return;
+                if (btn.id === "ACCESS" && !player.progress.patching) return;
+                if (btn.id === "BCM" && !player.progress.access) return;
+
                 if (btn.state) currentState = btn.state;
             }
         });
@@ -310,6 +353,7 @@ canvas.addEventListener("click", () => {
         if (!item.collected && isInside(item, mouseX, mouseY)) {
             item.collected = true;
             player.score += item.points;
+            player.phaseScores.inventory += item.points; // Track Phase Score
             player.inventory.push(item);
             // Optional: Play sound
         }
@@ -327,16 +371,67 @@ const AppStateMap = {
 
 // --- MAIN LOOP ---
 
+// --- MAIN LOOP ---
+
+const DOM_STATES = [
+    GameState.ASSET_INVENTORY,
+    GameState.PATCH_MGMT,
+    GameState.ACCESS_MGMT,
+    GameState.BCM_DR
+];
+
+let lastState = null;
+
 function gameLoop() {
-    // Clear screen
-    // ctx.clearRect(0, 0, canvas.width, canvas.height); // Optional, usually draw covers all
+    // 1. State Transition Handling (Run once per state change)
+    if (currentState !== lastState) {
+        // Exit Logic
+        if (DOM_STATES.includes(lastState) && !DOM_STATES.includes(currentState)) {
+            // Leaving a DOM state -> Hide UI
+            document.getElementById("ui-layer").classList.add("hidden");
+        }
+
+        // Entry Logic
+        if (DOM_STATES.includes(currentState)) {
+            // Entering a DOM state -> Render ONCE
+            switch (currentState) {
+                case GameState.ASSET_INVENTORY:
+                    InventoryPhase.render();
+                    break;
+                case GameState.PATCH_MGMT:
+                    if (!PatchingPhase.initialized) { PatchingPhase.init(); PatchingPhase.initialized = true; }
+                    PatchingPhase.render();
+                    break;
+                case GameState.ACCESS_MGMT:
+                    if (!AccessPhase.initialized) { AccessPhase.init(); AccessPhase.initialized = true; }
+                    AccessPhase.render();
+                    break;
+                case GameState.BCM_DR:
+                    if (!BCMPhase.initialized) { BCMPhase.init(); BCMPhase.initialized = true; }
+                    BCMPhase.render();
+                    break;
+            }
+        }
+
+        lastState = currentState;
+    }
+
+    // 2. Continuous Canvas Rendering (Run every frame)
+    // Only render canvas if we are NOT in a DOM state (or allowed to see bg)
+    // We can keep rendering background behind DOM for visual continuity if desired.
 
     switch (currentState) {
         case GameState.INTRO:
+            if (typeof introState === 'undefined' || !introState.lines || introState.lines.length === 0) {
+                initIntro();
+            }
             renderIntro(ctx, canvas);
             break;
 
         case GameState.STORY:
+            if (typeof storyState === 'undefined' || !storyState.lines || storyState.lines.length === 0) {
+                initStory();
+            }
             renderStory(ctx, canvas);
             break;
 
@@ -346,38 +441,7 @@ function gameLoop() {
 
         case GameState.MAIN_PAGE:
             renderMainPage(ctx, canvas);
-            renderHUD(); // Overlay HUD
-            break;
-
-        case GameState.ASSET_INVENTORY:
-            InventoryPhase.render();
-            break;
-
-        case GameState.PATCH_MGMT:
-            // Ensure we initialized data once
-            if (!PatchingPhase.initialized) {
-                PatchingPhase.init();
-                PatchingPhase.initialized = true;
-            }
-            PatchingPhase.render();
-            break;
-
-        case GameState.ACCESS_MGMT:
-            // Ensure we initialized data once
-            if (!AccessPhase.initialized) {
-                AccessPhase.init();
-                AccessPhase.initialized = true;
-            }
-            AccessPhase.render();
-            break;
-
-        case GameState.BCM_DR:
-            // Ensure we initialized data once
-            if (!BCMPhase.initialized) {
-                BCMPhase.init();
-                BCMPhase.initialized = true;
-            }
-            BCMPhase.render();
+            renderHUD();
             break;
 
         case GameState.SUBSTATION:
@@ -396,11 +460,21 @@ function gameLoop() {
             renderGenericSubPage("SOLAR");
             break;
 
+        // For DOM states, we don't strictly need to re-render the canvas every frame 
+        // if it's covered, but drawing the HUD/MainBG behind it looks nice.
+        // However, to save performance/battery, we could skip it. 
+        // Let's just draw specific placeholders or nothing.
+        case GameState.ASSET_INVENTORY:
+        case GameState.PATCH_MGMT:
+        case GameState.ACCESS_MGMT:
+        case GameState.BCM_DR:
+            // Optional: Draw a static background or just leave previous frame
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // renderHUD(); // Optional custom HUD for DOM modes?
             break;
 
         default:
-            // For management phases, we might want to just keep canvas black or draw a background
-            // The DOM overlay covers it, but let's clear it to be sure.
             ctx.fillStyle = "#000";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             break;

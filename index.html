@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <title>SCADA Cyber Defender - Terminal</title>
     <style>
+        /* CRT & RETRO EFFECTS */
         body {
-            background-color: #000;
+            background-color: #050505;
             margin: 0;
             overflow: hidden;
             display: flex;
@@ -14,6 +15,8 @@
             align-items: center;
             height: 100vh;
             font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 4px #00bb00;
+            /* Default Low Glow */
         }
 
         #gameContainer {
@@ -21,10 +24,59 @@
             height: 540px;
             position: relative;
             background: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            overflow: hidden;
+            /* Contain scanlines */
         }
 
-        canvas {
+        /* Scanline Overlay */
+        #gameContainer::before {
+            content: " ";
             display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Screen Flicker Animation */
+        @keyframes flicker {
+            0% {
+                opacity: 0.97;
+            }
+
+            5% {
+                opacity: 0.95;
+            }
+
+            10% {
+                opacity: 0.9;
+            }
+
+            15% {
+                opacity: 0.95;
+            }
+
+            20% {
+                opacity: 0.99;
+            }
+
+            50% {
+                opacity: 0.95;
+            }
+
+            80% {
+                opacity: 0.9;
+            }
+
+            100% {
+                opacity: 0.97;
+            }
         }
 
         #ui-layer {
@@ -42,27 +94,60 @@
             color: #00bb00;
             font-family: 'Courier New', Courier, monospace;
             z-index: 10;
+            animation: flicker 0.15s infinite;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        /* ... Existing Styles ... */
 
-        /* Common UI Elements */
         .panel {
             border: 2px solid #00bb00;
             padding: 20px;
             background: #000;
             width: 80%;
+            height: 80%;
             max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0 0 10px #00bb00;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 15px #00bb00, inset 0 0 10px #00bb00;
+            /* Increased Glow */
+            overflow: hidden;
+            position: relative;
         }
 
-        h2 {
-            border-bottom: 1px dashed #00bb00;
-            padding-bottom: 10px;
-            margin-top: 0;
+        /* Tech Corners (Simple CSS trick) */
+        .panel::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background:
+                linear-gradient(to right, #00bb00 2px, transparent 2px) 0 0,
+                linear-gradient(to bottom, #00bb00 2px, transparent 2px) 0 0,
+                linear-gradient(to left, #00bb00 2px, transparent 2px) 100% 0,
+                linear-gradient(to bottom, #00bb00 2px, transparent 2px) 100% 0,
+                linear-gradient(to left, #00bb00 2px, transparent 2px) 100% 100%,
+                linear-gradient(to top, #00bb00 2px, transparent 2px) 100% 100%,
+                linear-gradient(to right, #00bb00 2px, transparent 2px) 0 100%,
+                linear-gradient(to top, #00bb00 2px, transparent 2px) 0 100%;
+            background-size: 20px 20px;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .panel-header {
+            border-bottom: 2px dashed #00bb00;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            text-shadow: 0 0 8px #00ff00;
         }
 
         button {
@@ -74,11 +159,15 @@
             font-family: inherit;
             margin: 5px;
             text-transform: uppercase;
+            box-shadow: 0 0 5px #00bb00;
+            transition: all 0.1s;
         }
 
         button:hover {
             background: #00bb00;
             color: #000;
+            box-shadow: 0 0 15px #00ff00;
+            text-shadow: none;
         }
 
         .row {
@@ -91,11 +180,16 @@
 
         input,
         select {
-            background: #111;
+            background: #050505;
             color: #00ff00;
             border: 1px solid #00bb00;
             padding: 5px;
             font-family: inherit;
+            box-shadow: 0 0 2px #00bb00;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -120,6 +214,37 @@
     <script src="src/phases/access.js"></script>
     <script src="src/phases/bcm.js"></script>
     <script src="src/main.js"></script>
+    <script>
+        // Full Window Scaling Logic
+        function resizeGame() {
+            const gameContainer = document.getElementById("gameContainer");
+            const width = 960;
+            const height = 540;
+            const aspect = width / height;
+            const windowAspect = window.innerWidth / window.innerHeight;
+
+            let scale;
+
+            if (windowAspect < aspect) {
+                // Window is taller than game aspect -> fit width
+                scale = window.innerWidth / width;
+            } else {
+                // Window is wider than game aspect -> fit height
+                scale = window.innerHeight / height;
+            }
+
+            // Apply Scale
+            gameContainer.style.transform = `scale(${scale})`;
+            gameContainer.style.transformOrigin = "center";
+
+            // Store scale globally for mouse correction if needed (main.js handles robust rect checks usually)
+            window.gameScale = scale;
+        }
+
+        window.addEventListener("resize", resizeGame);
+        // Initial Call
+        resizeGame();
+    </script>
 </body>
 
 </html>
