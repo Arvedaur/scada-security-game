@@ -5,43 +5,68 @@
     <meta charset="UTF-8">
     <title>SCADA Cyber Defender - Terminal</title>
     <style>
-        /* CRT & RETRO EFFECTS */
-        body {
-            background-color: #050505;
+        :root {
+            --bg-dark: #050510;
+            --panel-bg: rgba(5, 5, 20, 0.85);
+            --neon-cyan: #00fbff;
+            --neon-magenta: #ff00ff;
+            --neon-yellow: #ffae00;
+            --neon-red: #ff2d44;
+            --retro-green: #39ff14;
+            --glow-strength: 15px;
+        }
+
+        body,
+        html {
             margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            color: var(--neon-cyan);
             font-family: 'Courier New', Courier, monospace;
-            text-shadow: 0 0 4px #00bb00;
-            /* Default Low Glow */
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 251, 255, 0.05) 0%, transparent 80%),
+                linear-gradient(0deg, transparent 24%, rgba(0, 251, 255, 0.02) 25%, rgba(0, 251, 255, 0.02) 26%, transparent 27%, transparent 74%, rgba(0, 251, 255, 0.02) 75%, rgba(0, 251, 255, 0.02) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 251, 255, 0.02) 25%, rgba(0, 251, 255, 0.02) 26%, transparent 27%, transparent 74%, rgba(0, 251, 255, 0.02) 75%, rgba(0, 251, 255, 0.02) 76%, transparent 77%, transparent);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
         }
 
         #gameContainer {
-            width: 960px;
-            height: 540px;
-            position: relative;
+            position: absolute;
+            width: 1920px;
+            height: 1080px;
             background: #000;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            border: 4px solid #39ff14;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.4);
+            transform-origin: center center;
+            left: 50%;
+            top: 50%;
             overflow: hidden;
-            /* Contain scanlines */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Scanline Overlay */
-        #gameContainer::before {
-            content: " ";
+        canvas {
             display: block;
+            background: #000;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Scanline / CRT Effect Overlays */
+        #crt-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 999;
-            background-size: 100% 2px, 3px 100%;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 100;
         }
 
         /* Screen Flicker Animation */
@@ -79,25 +104,23 @@
             }
         }
 
+        /* UI Layer for Panels */
         #ui-layer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: auto;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.85);
-            color: #00bb00;
-            font-family: 'Courier New', Courier, monospace;
-            z-index: 10;
+            z-index: 50;
             animation: flicker 0.15s infinite;
         }
 
-        /* ... Existing Styles ... */
+        .hidden {
+            display: none !important;
+        }
 
         .panel {
             border: 2px solid #00bb00;
@@ -196,48 +219,47 @@
 
 <body>
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="960" height="540"></canvas>
+        <canvas id="gameCanvas" width="1920" height="1080"></canvas>
         <div id="ui-layer" class="hidden"></div>
     </div>
 
     <script src="src/states.js"></script>
     <script src="src/intro.js"></script>
     <script src="src/story.js"></script>
+    <script src="src/scadaIntro.js"></script>
     <script src="src/mainPage.js"></script>
     <script src="src/substation.js"></script>
-    <script src="src/substation.js"></script>
-    <script src="src/phases/inventory.js"></script>
-    <script src="src/phases/inventory.js"></script>
-    <script src="src/phases/patching.js"></script>
     <script src="src/phases/inventory.js"></script>
     <script src="src/phases/patching.js"></script>
     <script src="src/phases/access.js"></script>
     <script src="src/phases/bcm.js"></script>
+    <script src="src/opgw.js"></script>
     <script src="src/main.js"></script>
     <script>
         // Full Window Scaling Logic
         function resizeGame() {
             const gameContainer = document.getElementById("gameContainer");
-            const width = 960;
-            const height = 540;
+            const width = 1920;
+            const height = 1080;
             const aspect = width / height;
-            const windowAspect = window.innerWidth / window.innerHeight;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const windowAspect = windowWidth / windowHeight;
 
             let scale;
 
             if (windowAspect < aspect) {
                 // Window is taller than game aspect -> fit width
-                scale = window.innerWidth / width;
+                scale = windowWidth / width;
             } else {
                 // Window is wider than game aspect -> fit height
-                scale = window.innerHeight / height;
+                scale = windowHeight / height;
             }
 
-            // Apply Scale
-            gameContainer.style.transform = `scale(${scale})`;
-            gameContainer.style.transformOrigin = "center";
+            // Apply Scale and Manual Centering via Translation
+            gameContainer.style.transform = `translate(-50%, -50%) scale(${scale})`;
 
-            // Store scale globally for mouse correction if needed (main.js handles robust rect checks usually)
+            // Store scale globally for mouse correction
             window.gameScale = scale;
         }
 

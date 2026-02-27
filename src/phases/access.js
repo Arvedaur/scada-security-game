@@ -2,10 +2,12 @@
 const AccessPhase = {
     generatedRequests: {}, // assetId -> Array of requests
     processedAssets: new Set(),
+    initialized: false,
 
     init() {
         this.generatedRequests = {};
         this.processedAssets.clear();
+        this.initialized = true;
 
         // Generate mock requests for each asset
         player.inventory.forEach(asset => {
@@ -81,16 +83,19 @@ const AccessPhase = {
 
         const panel = document.createElement("div");
         panel.className = "panel";
+        panel.style.borderColor = "var(--retro-green)";
+        panel.style.borderWidth = "4px";
+        panel.style.boxShadow = "0 0 20px var(--retro-green)";
 
         // HEADER
         const header = document.createElement("div");
         header.className = "panel-header";
         header.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="margin:0;">ACCESS MANAGEMENT REVIEW</h2>
-                <h2 style="margin:0; color:#bb0000;">SCORE: ${player.score}</h2>
+                <h2 style="margin:0; color:var(--retro-green); text-shadow:0 0 15px var(--retro-green);">ACCESS MANAGEMENT REVIEW</h2>
+                <h2 style="margin:0; color:white; text-shadow:0 0 5px var(--retro-green);">SCORE: ${player.score}</h2>
             </div>
-            <p>Review pending access requests. Approve legitimate users (Engineer/Site Manager) with valid emails. Reject violations.</p>
+            <p style="color:var(--retro-green);">Review pending access requests. Approve legitimate users (Engineer/Site Manager) with valid emails. Reject violations.</p>
         `;
         panel.appendChild(header);
 
@@ -100,20 +105,22 @@ const AccessPhase = {
         content.style.display = "flex";
         content.style.flexDirection = "row";
         content.style.padding = "0";
+        content.style.height = "calc(100% - 150px)";
 
         // Left: Asset List
         const assetList = document.createElement("div");
         assetList.style.flex = "1";
-        assetList.style.borderRight = "1px solid #00bb00";
+        assetList.style.borderRight = "2px solid var(--retro-green)";
         assetList.style.padding = "10px";
         assetList.style.overflowY = "auto";
-        assetList.innerHTML = "<h3>Pending Reviews</h3>";
+        assetList.innerHTML = "<h3 style='color:var(--retro-green);'>Pending Reviews</h3>";
 
         // Right View
         const details = document.createElement("div");
         details.style.flex = "2";
         details.style.padding = "20px";
-        details.innerHTML = "<h3>Request Queue</h3><p>Select a system to review requests.</p>";
+        details.style.overflowY = "auto";
+        details.innerHTML = "<h3 style='color:var(--retro-green);'>Request Queue</h3><p style='color:#fff;'>Select a system to review requests.</p>";
 
         player.inventory.forEach(asset => {
             const reqs = this.generatedRequests[asset.id];
@@ -122,8 +129,10 @@ const AccessPhase = {
             const btn = document.createElement("button");
             btn.style.width = "100%";
             btn.style.textAlign = "left";
+            btn.style.borderColor = "var(--retro-green)";
+            btn.style.borderWidth = "2px";
+            btn.style.color = pendingCount === 0 ? "#555" : "var(--retro-green)";
             btn.innerText = `${pendingCount === 0 ? "[DONE]" : "[PENDING]"} ${asset.name} (${pendingCount})`;
-            if (pendingCount === 0) btn.style.color = "#555";
 
             btn.onclick = () => {
                 this.renderRequestList(asset, details);
@@ -138,8 +147,11 @@ const AccessPhase = {
         // FOOTER
         const footer = document.createElement("div");
         footer.className = "panel-footer";
+        footer.style.marginTop = "10px";
         const proceedBtn = document.createElement("button");
         proceedBtn.innerText = "PROCEED TO BCM / DR >>";
+        proceedBtn.style.color = "var(--neon-yellow)";
+        proceedBtn.style.borderColor = "var(--neon-yellow)";
         proceedBtn.onclick = () => {
             // Check if all processed?
             let allDone = true;
@@ -148,10 +160,19 @@ const AccessPhase = {
             });
 
             if (!allDone) {
-                if (!confirm("Warning: You have unprocessed requests. Unreviewed requests will be auto-rejected. Proceed?")) return;
+                showDecisionDialog("UNPROCESSED REQUESTS",
+                    "You have unprocessed requests. Unreviewed requests will be auto-rejected. Proceed?",
+                    () => {
+                        player.progress.access = true;
+                        currentState = GameState.BCM_DR;
+                        ui.classList.add("hidden");
+                    }
+                );
+            } else {
+                player.progress.access = true;
+                currentState = GameState.BCM_DR;
+                ui.classList.add("hidden");
             }
-            currentState = GameState.BCM_DR;
-            ui.classList.add("hidden");
         };
         footer.appendChild(proceedBtn);
         panel.appendChild(footer);
@@ -160,26 +181,27 @@ const AccessPhase = {
     },
 
     renderRequestList(asset, container) {
-        container.innerHTML = `<h3>Requests for ${asset.name}</h3>`;
+        container.innerHTML = `<h3 style='color:var(--neon-green);'>Requests for ${asset.name}</h3>`;
 
         const requests = this.generatedRequests[asset.id];
 
         if (requests.length === 0) {
-            container.innerHTML += "<p>No pending requests.</p>";
+            container.innerHTML += "<p style='color:#fff;'>No pending requests.</p>";
             return;
         }
 
         requests.forEach(req => {
-            if (req.processed) return; // Don't show processed ones? Or show them disabled.
+            if (req.processed) return;
 
             const card = document.createElement("div");
-            card.style.border = "1px solid #00bb00";
-            card.style.padding = "10px";
-            card.style.marginBottom = "10px";
+            card.style.border = "1px solid var(--neon-cyan)";
+            card.style.padding = "15px";
+            card.style.marginBottom = "15px";
+            card.style.background = "rgba(0, 251, 255, 0.05)";
 
             card.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 5px;">User: ${req.email}</div>
-                <div style="font-size: 0.9em; margin-bottom: 10px;">
+                <div style="font-weight: bold; margin-bottom: 5px; color:var(--neon-green);">User: ${req.email}</div>
+                <div style="font-size: 0.9em; margin-bottom: 10px; color:#fff;">
                     Role: ${req.role} | Level: ${req.level}
                 </div>
             `;
@@ -190,14 +212,14 @@ const AccessPhase = {
 
             const approveBtn = document.createElement("button");
             approveBtn.innerText = "APPROVE";
-            approveBtn.style.borderColor = "#00ff00";
-            approveBtn.style.color = "#00ff00";
+            approveBtn.style.borderColor = "var(--neon-green)";
+            approveBtn.style.color = "var(--neon-green)";
             approveBtn.onclick = () => this.processRequest(req, true, asset);
 
             const rejectBtn = document.createElement("button");
             rejectBtn.innerText = "REJECT";
-            rejectBtn.style.borderColor = "#ff0000";
-            rejectBtn.style.color = "#ff0000";
+            rejectBtn.style.borderColor = "var(--neon-red)";
+            rejectBtn.style.color = "var(--neon-red)";
             rejectBtn.onclick = () => this.processRequest(req, false, asset);
 
             btnRow.appendChild(approveBtn);
@@ -208,7 +230,7 @@ const AccessPhase = {
         });
 
         if (requests.filter(r => !r.processed).length === 0) {
-            container.innerHTML += "<p>All requests processed.</p>";
+            container.innerHTML += "<p style='color:var(--neon-green);'>All requests processed.</p>";
         }
     },
 
@@ -228,7 +250,6 @@ const AccessPhase = {
                 msg = `VIOLATION: Granted Access to Invalid Request.`;
                 incidentValue = `Granted Unauthorized Access to ${req.email}`;
 
-                // Why?
                 msg += `\n\nWHY IT MATTERS: ${req.violationReason}`;
                 if (req.violationReason.includes("Excessive Privileges")) {
                     msg += "\n\nPRINCIPLE OF LEAST PRIVILEGE: Users should only have the bare minimum access rights needed for their job.";
@@ -252,7 +273,7 @@ const AccessPhase = {
 
         if (incidentValue) player.incidents.push(incidentValue);
 
-        alert(`${msg} (${points > 0 ? '+' : ''}${points} PTS)`);
+        showStatusMessage(`${msg} (${points > 0 ? '+' : ''}${points} PTS)`, 4000);
 
         this.render(); // Redraw
     }

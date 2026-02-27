@@ -2,63 +2,84 @@ const mainPageImage = new Image();
 mainPageImage.src = "assets/images/MainPage.png";
 
 const systemZones = [
-  // 🟢 WTG (Rüzgar Türbinleri - üst sol)
+  // 🟢 WTG (Wind Farm - Top Left)
   {
     name: "WTG",
-    x: 80,
-    y: 80,
-    w: 300,
-    h: 220,
+    x: 50,
+    y: 150,
+    w: 350,
+    h: 300,
     state: GameState.WTG
   },
 
-  // 🟡 BESS (Battery Storage - orta sol)
+  // 🟡 BESS (Battery Storage - Middle Left)
   {
     name: "BESS",
-    x: 90,
-    y: 260,
-    w: 300,
-    h: 160,
+    x: 50,
+    y: 470,
+    w: 350,
+    h: 250,
     state: GameState.BESS
   },
 
-  // 🔵 SOLAR (alt sol)
+  // 🔵 SOLAR (Solar Power - Bottom Left)
   {
     name: "SOLAR",
-    x: 80,
-    y: 420,
-    w: 320,
-    h: 110,
+    x: 50,
+    y: 750,
+    w: 400,
+    h: 280,
     state: GameState.SOLAR
   },
 
-  // 🔴 SUBSTATION (sağ taraf bina)
+  // 🔴 SUBSTATION (Main Substation - Right)
   {
     name: "SUBSTATION",
-    x: 520,
-    y: 200,
-    w: 360,
-    h: 260,
+    x: 1200,
+    y: 400,
+    w: 600,
+    h: 450,
     state: GameState.SUBSTATION
+  },
+
+  // 🟣 OPGW (Transmission Lines - Top Right)
+  {
+    name: "OPGW",
+    x: 1300,
+    y: 150,
+    w: 500,
+    h: 200,
+    state: GameState.OPGW
   }
 ];
+
 function renderMainPage(ctx, canvas) {
   ctx.drawImage(mainPageImage, 0, 0, canvas.width, canvas.height);
-  
-  ctx.fillStyle = "#00ffcc";
-  ctx.font = "14px monospace";
+
+  // Hover feedback for system zones
+  if (window.gameStarted && typeof systemZones !== 'undefined') {
+    systemZones.forEach(zone => {
+      if (isInside(zone, window.mouseX, window.mouseY)) {
+        ctx.strokeStyle = "rgba(57, 255, 20, 0.4)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+
+        // Optional: Tooltip or label
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(zone.x, zone.y - 40, 200, 30);
+        ctx.fillStyle = "#39ff14";
+        ctx.font = "bold 16px monospace";
+        ctx.textAlign = "left";
+        ctx.fillText(`> GOTO: ${zone.name}`, zone.x + 10, zone.y - 18);
+      }
+    });
+  }
+
+  ctx.fillStyle = "rgba(57, 255, 20, 0.9)";
+  ctx.font = "bold 32px monospace";
   ctx.textAlign = "center";
-  ctx.fillText("SYSTEM STATUS", canvas.width / 2, 40);
-
-  // DEBUG (istersen aç)
-  // ctx.strokeStyle = "red";
-  // systemZones.forEach(z => ctx.strokeRect(z.x, z.y, z.w, z.h));
-  // DEBUG: Tıklanabilir alanları göster
-  ctx.strokeStyle = "rgba(255,0,0,0.6)";
-  ctx.lineWidth = 2;
-
-  systemZones.forEach(zone => {
-  ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
-});
-
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = "#39ff14";
+  ctx.fillText("GRID STATUS: UNSTABLE - FIRMWARE TAMPERING DETECTED", canvas.width / 2, 180);
+  ctx.shadowBlur = 0;
 }

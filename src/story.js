@@ -1,5 +1,6 @@
-// Re-use logic from intro.js or similar
-// For simplicity, let's keep it self-contained but use the new style
+
+const storyBG = new Image();
+storyBG.src = "assets/images/Intro.png";
 
 let storyState = {
   lines: [],
@@ -31,7 +32,7 @@ const STORY_TEXT = [
   "THE GRID IS THE TARGET.",
   "YOU ARE THE FIREWALL.",
   "",
-  "PRESS [ENTER] TO BEGIN OPERATION..._"
+  "> Press [SPACE] to Deploy Cyber Defenses..."
 ];
 
 function initStory() {
@@ -47,16 +48,14 @@ function initStory() {
 function updateStory() {
   if (storyState.complete) return;
 
-  if (Date.now() - storyState.lastUpdate > 40) { // Slightly slower for dramatic effect
+  if (Date.now() - storyState.lastUpdate > 40) {
     storyState.lastUpdate = Date.now();
-
     storyState.charIndex++;
     const currentString = storyState.lines[storyState.currentLine];
 
     if (storyState.charIndex > currentString.length) {
       storyState.currentLine++;
       storyState.charIndex = 0;
-
       if (storyState.currentLine >= storyState.lines.length) {
         storyState.complete = true;
       }
@@ -70,40 +69,32 @@ function renderStory(ctx, canvas) {
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.textAlign = "center";
-  ctx.font = "18px monospace";
+  ctx.textAlign = "left";
+  ctx.font = "bold 28px 'Courier New', monospace";
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = "#00ff00";
+  ctx.fillStyle = "#00ff00";
 
-  let startY = 60;
-  const lineHeight = 25;
+  let startY = 150;
+  const lineHeight = 45;
 
-  // Draw completed lines
   for (let i = 0; i < storyState.currentLine; i++) {
-    let line = storyState.lines[i];
-
-    if (line.includes("YEAR 2026")) ctx.fillStyle = "#00ffaa";
-    else if (line.includes("TARGETS")) ctx.fillStyle = "#ff0000";
-    else if (line.includes(">")) ctx.fillStyle = "#ff5555";
-    else ctx.fillStyle = "#00bb00";
-
-    ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
+    ctx.fillText(storyState.lines[i], 80, startY + i * lineHeight);
   }
 
-  // Draw typing line
   if (!storyState.complete && storyState.currentLine < storyState.lines.length) {
-    let line = storyState.lines[storyState.currentLine];
-    let sub = line.substring(0, storyState.charIndex);
-
-    ctx.fillStyle = "#00ff00"; // Typing color
-    ctx.fillText(sub + "█", canvas.width / 2, startY + storyState.currentLine * lineHeight);
+    const subString = storyState.lines[storyState.currentLine].substring(0, storyState.charIndex);
+    ctx.fillText(subString + "█", 80, startY + storyState.currentLine * lineHeight);
   }
 
-  // Continue Trigger
+  ctx.shadowBlur = 0;
+
   if (storyState.complete) {
     if (Date.now() % 1000 < 500) {
       ctx.fillStyle = "#fff";
-      ctx.fillText("[ PRESS ENTER TO DEPLOY ]", canvas.width / 2, canvas.height - 50);
+      ctx.font = "bold 24px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("> PRESS [SPACE] TO CONTINUE <", canvas.width / 2, canvas.height - 80);
     }
   }
 }
-
-// Ensure main.js calls initStory() when switching to this state
