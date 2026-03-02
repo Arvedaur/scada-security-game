@@ -30,8 +30,27 @@ function renderOPGW(ctx, canvas) {
     ctx.fillText("SYSTEM: OPTICAL GROUND WIRE (OPGW) TERMINATION", canvas.width / 2, 130);
     ctx.shadowBlur = 0;
 
-    // The generic render logic in main.js will handle the boxes if we use the generic approach,
-    // but here we can add specific visual polish if needed.
+    // Interactive Items
+    const assetData = subPageAssets["OPGW"];
+    assetData.items.forEach(item => {
+        if (!item.collected) {
+            const h = isInside(item, mouseX, mouseY);
+
+            // Draw item box
+            ctx.fillStyle = h ? "rgba(0, 255, 0, 0.2)" : "rgba(0, 0, 0, 0.5)";
+            ctx.fillRect(item.x, item.y, item.w, item.h);
+
+            ctx.strokeStyle = h ? "#fff" : "#00ff00";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(item.x, item.y, item.w, item.h);
+
+            // Label
+            ctx.fillStyle = "#fff";
+            ctx.font = "12px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(item.name, item.x + item.w / 2, item.y + item.h / 2 + 5);
+        }
+    });
 
     ctx.fillStyle = "#555";
     ctx.font = "16px monospace";

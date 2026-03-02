@@ -9,18 +9,12 @@ substationImage.src = "assets/images/Substation.png";
 
 // Define globally so main.js can access for click testing
 window.substationAssets = [
-  // Rack Left
-  { id: "SUB_CS", name: "Core Switch", x: 92, y: 460, w: 250, h: 100, points: 20, collected: false, details: { vendor: "Nexus OT Systems", age: "4 years", fw: "OS v2.4.1", ip: "10.50.1.1", mac: "00:1A:4D:5E:6F:01" } },
-  { id: "SUB_FW1", name: "OT Firewall (External)", x: 104, y: 760, w: 236, h: 80, points: 30, collected: false, details: { vendor: "SecureLink OT", age: "2 years", fw: "v5.1.0-br", ip: "10.50.1.5", mac: "00:1A:4D:5E:6F:10" } },
-
-  // Rack Middle
-  { id: "SUB_SRV", name: "Wind Farm SCADA Server", x: 388, y: 228, w: 228, h: 100, points: 40, collected: false, details: { vendor: "CyberLogic OT", age: "1 year", fw: "v4.2.2-stable", ip: "10.50.1.20", mac: "00:1A:4D:5E:6F:A2" } },
-  { id: "SUB_FW2", name: "OT Firewall (Internal)", x: 395, y: 760, w: 225, h: 80, points: 30, collected: false, details: { vendor: "SecureLink OT", age: "2 years", fw: "v5.1.0-br", ip: "10.50.1.21", mac: "00:1A:4D:5E:6F:11" } },
-
-  // Rack Right
-  { id: "SUB_REL1", name: "Protection Relay Alpha", x: 655, y: 580, w: 150, h: 60, points: 25, collected: false, details: { vendor: "Aether Control", age: "7 years", fw: "v3.0.4", ip: "10.50.1.51", mac: "00:1A:4D:5E:6F:B1" } },
-  { id: "SUB_REL2", name: "Protection Relay Beta", x: 800, y: 580, w: 150, h: 60, points: 25, collected: false, details: { vendor: "Aether Control", age: "7 years", fw: "v3.0.4", ip: "10.50.1.52", mac: "00:1A:4D:5E:6F:B2" } },
-  { id: "SUB_ENG", name: "Engineering Workstation", x: 670, y: 760, w: 284, h: 150, points: 15, collected: false, details: { vendor: "Titan Dynamics", age: "2 years", fw: "WinOT v10.4", ip: "10.50.1.100", mac: "00:1A:4D:5E:6F:C8" } }
+  { id: "SUB_HV", name: "HV SCADA", x: 70, y: 80, w: 155, h: 160, points: 25, collected: false, details: { vendor: "CyberLogic OT", age: "5 years", fw: "v4.2.0", ip: "10.50.1.10", mac: "00:1B:2C:3D:4E:01" } },
+  { id: "SUB_WTG", name: "WTG SCADA", x: 235, y: 80, w: 155, h: 160, points: 25, collected: false, details: { vendor: "CyberLogic OT", age: "5 years", fw: "v4.2.0", ip: "10.50.1.11", mac: "00:1B:2C:3D:4E:02" } },
+  { id: "SUB_REL", name: "Protection Relays", x: 400, y: 180, w: 155, h: 160, points: 30, collected: false, details: { vendor: "Aether Control", age: "3 years", fw: "v1.8.4", ip: "10.50.5.100", mac: "00:1B:2C:3D:4E:A1" } },
+  { id: "SUB_MET", name: "Power Meter", x: 565, y: 80, w: 155, h: 160, points: 15, collected: false, details: { vendor: "Quantec Power", age: "2 years", fw: "v3.0", ip: "10.50.5.200", mac: "00:1B:2C:3D:4E:B2" } },
+  { id: "SUB_FW", name: "Firewall", x: 730, y: 80, w: 155, h: 160, points: 35, collected: false, details: { vendor: "Nexus OT Systems", age: "1 year", fw: "OS v3.5.0", ip: "10.50.10.1", mac: "00:1B:2C:3D:4E:F5" } },
+  { id: "SUB_ENG", name: "ENG Workstation", x: 1100, y: 750, w: 400, h: 100, points: 40, collected: false, details: { vendor: "Titan Dynamics", age: "1 year", fw: "WinOT v10.2", ip: "10.50.10.50", mac: "00:1B:2C:3D:4E:EE" } }
 ];
 
 function renderSubstation(ctx, canvas) {
