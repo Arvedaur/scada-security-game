@@ -115,11 +115,20 @@ const PatchingPhase = {
         header.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="margin:0; color:var(--retro-green); text-shadow:0 0 15px var(--retro-green);">PATCH MANAGEMENT SYSTEM</h2>
-                <h2 style="margin:0; color:var(--neon-red); text-shadow:0 0 10px var(--neon-red);">SCORE: ${player.score}</h2>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <h2 style="margin:0; color:var(--neon-red); text-shadow:0 0 10px var(--neon-red);">SCORE: ${player.score}</h2>
+                    <div id="patch-help-btn" style="width:30px; height:30px; border:2px solid var(--retro-green); color:var(--retro-green); display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; font-size:20px;">?</div>
+                </div>
             </div>
             <p style="color:var(--retro-green);">Select High Risk (>15) & Verified Patches. Minimize Downtime for operational continuity.</p>
         `;
         panel.appendChild(header);
+
+        // Add help click handler after it's in the DOM
+        setTimeout(() => {
+            const btn = document.getElementById("patch-help-btn");
+            if (btn) btn.onclick = () => HelpSystem.showHelp();
+        }, 0);
 
         // 2. PANEL CONTENT
         const content = document.createElement("div");
@@ -180,10 +189,15 @@ const PatchingPhase = {
                 patches.forEach(patch => {
                     const risk = patch.prob * patch.impact;
                     const card = document.createElement("div");
-                    card.className = "patch-detail-card";
+                    card.style.border = "4px solid var(--retro-green)";
+                    card.style.background = "rgba(0, 255, 0, 0.05)";
+                    card.style.padding = "15px";
+                    card.style.marginBottom = "20px";
+                    card.style.boxShadow = "0 0 15px rgba(57, 255, 20, 0.2)";
+
                     card.innerHTML = `
-                        <div class="patch-card-header">
-                            <div style="color:var(--retro-green); font-weight:bold; font-size:18px;">${patch.id}</div>
+                        <div class="patch-card-header" style="margin-bottom:15px; border-bottom:2px solid var(--retro-green); padding-bottom:10px;">
+                            <div style="display:inline-block; background:var(--retro-green); color:#000; padding:5px 15px; font-weight:bold; font-size:22px; border:2px solid var(--retro-green); text-transform:uppercase;">${patch.id}</div>
                         </div>
                         <div class="patch-card-body">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -198,8 +212,24 @@ const PatchingPhase = {
                     `;
 
                     const deployBtn = document.createElement("button");
-                    deployBtn.className = "deploy-button";
                     deployBtn.innerText = "DEPLOY PATCH";
+                    deployBtn.style.background = "transparent";
+                    deployBtn.style.border = "2px solid var(--retro-green)";
+                    deployBtn.style.color = "var(--retro-green)";
+                    deployBtn.style.padding = "10px 20px";
+                    deployBtn.style.fontWeight = "bold";
+                    deployBtn.style.cursor = "pointer";
+                    deployBtn.style.marginTop = "10px";
+
+                    deployBtn.onmouseover = () => {
+                        deployBtn.style.background = "var(--retro-green)";
+                        deployBtn.style.color = "#000";
+                    };
+                    deployBtn.onmouseout = () => {
+                        deployBtn.style.background = "transparent";
+                        deployBtn.style.color = "var(--retro-green)";
+                    };
+
                     deployBtn.onclick = () => this.applyPatch(selectedAsset, patch);
                     card.querySelector(".patch-card-body").appendChild(deployBtn);
                     details.appendChild(card);
@@ -221,8 +251,27 @@ const PatchingPhase = {
         const allDone = this.processedAssets.size === player.inventory.length;
         const proceedBtn = document.createElement("button");
         proceedBtn.innerText = "PROCEED TO ACCESS CONTROL >>";
-        proceedBtn.style.color = allDone ? "var(--neon-yellow)" : "#444";
-        proceedBtn.style.borderColor = allDone ? "var(--neon-yellow)" : "#444";
+        proceedBtn.style.padding = "15px 40px";
+        proceedBtn.style.fontSize = "20px";
+        proceedBtn.style.fontWeight = "bold";
+        proceedBtn.style.cursor = allDone ? "pointer" : "not-allowed";
+        proceedBtn.style.color = allDone ? "var(--retro-green)" : "#444";
+        proceedBtn.style.borderColor = allDone ? "var(--retro-green)" : "#444";
+        proceedBtn.style.borderWidth = "2px";
+        proceedBtn.style.background = "transparent";
+        proceedBtn.style.boxShadow = allDone ? "0 0 15px rgba(57, 255, 20, 0.3)" : "none";
+
+        if (allDone) {
+            proceedBtn.onmouseover = () => {
+                proceedBtn.style.background = "var(--retro-green)";
+                proceedBtn.style.color = "#000";
+            };
+            proceedBtn.onmouseout = () => {
+                proceedBtn.style.background = "transparent";
+                proceedBtn.style.color = "var(--retro-green)";
+            };
+        }
+
         proceedBtn.onclick = () => {
             if (allDone) {
                 this.finishPhase();
@@ -230,6 +279,7 @@ const PatchingPhase = {
                 showStatusMessage("ERROR: SEVERE RISK DETECTED. ALL ASSETS MUST BE PATCHED.");
             }
         };
+
         footer.appendChild(proceedBtn);
         panel.appendChild(footer);
 

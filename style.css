@@ -155,17 +155,35 @@ canvas {
 }
 
 .patch-detail-card {
-    border: 1px dashed rgba(57, 255, 20, 0.4);
-    padding: 15px;
-    margin-bottom: 20px;
-    background: transparent;
+    border: 2px solid var(--retro-green);
+    padding: 20px;
+    margin-bottom: 25px;
+    background: rgba(57, 255, 20, 0.05);
     position: relative;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+    transition: all 0.2s ease;
+}
+
+.patch-detail-card:hover {
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+    background: rgba(57, 255, 20, 0.08);
 }
 
 .patch-card-header {
-    border-bottom: 1px dotted rgba(57, 255, 20, 0.4);
-    padding-bottom: 8px;
     margin-bottom: 15px;
+}
+
+.kb-tag {
+    display: inline-block;
+    color: #000;
+    background-color: var(--retro-green);
+    padding: 4px 12px;
+    font-weight: bold;
+    font-size: 18px;
+    border: 2px solid var(--retro-green);
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .patch-card-body {
@@ -191,17 +209,21 @@ canvas {
 
 .deploy-button {
     background: transparent;
-    border: 1px solid var(--retro-green);
+    border: 2px solid var(--retro-green);
     color: var(--retro-green);
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 14px;
+    font-weight: bold;
     cursor: pointer;
     text-transform: uppercase;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 5px rgba(57, 255, 20, 0.2);
 }
 
 .deploy-button:hover {
     background: var(--retro-green);
     color: #000;
+    box-shadow: 0 0 15px var(--retro-green);
 }
 
 .proceed-button {

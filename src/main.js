@@ -25,6 +25,8 @@ const navButtons = [
     { id: "BCM", label: "[ BCM / DR ]", state: GameState.BCM_DR, x: 1300, y: 20, w: 350, h: 60, color: "#39ff14" }
 ];
 
+const helpButton = { id: "HELP", x: 1700, y: 25, w: 50, h: 50 };
+
 // Helper to map State -> Key for Assets
 const AppStateMap = {
     "WTG": GameState.WTG,
@@ -148,6 +150,24 @@ function renderHUD() {
             ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2 + 8);
         }
     });
+
+    // 🆕 Help Icon "?"
+    const hHelp = isInside(helpButton, mouseX, mouseY);
+    ctx.textAlign = "center";
+    ctx.font = "bold 34px monospace";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = hHelp ? "#fff" : "var(--retro-green)";
+    ctx.fillStyle = hHelp ? "#fff" : "var(--retro-green)";
+
+    ctx.strokeRect(helpButton.x, helpButton.y, helpButton.w, helpButton.h);
+    ctx.fillText("?", helpButton.x + helpButton.w / 2, helpButton.y + helpButton.h / 2 + 12);
+
+    if (hHelp) {
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#fff";
+        ctx.strokeRect(helpButton.x, helpButton.y, helpButton.w, helpButton.h);
+        ctx.shadowBlur = 0;
+    }
 }
 
 function renderLogin() {
@@ -287,6 +307,10 @@ function renderGenericSubPage(key) {
 window.addEventListener("keydown", (e) => {
     // Global ESC
     if (e.key === "Escape") {
+        if (typeof InventoryPhase !== 'undefined' && InventoryPhase.isFrozen) {
+            showStatusMessage("NAVIGATION LOCKED: ASSET REGISTER FROZEN. ESCAPE DISABLED.", 3000);
+            return;
+        }
         if (currentState !== GameState.INTRO && currentState !== GameState.LOGIN) {
             currentState = GameState.MAIN_PAGE;
         }
@@ -355,6 +379,14 @@ canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (canvas.width / rect.width);
     const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    // 0. Help Click?
+    if (isInside(helpButton, x, y)) {
+        if (typeof HelpSystem !== 'undefined') {
+            HelpSystem.showHelp();
+            return;
+        }
+    }
 
     // 1. HUD Navigation (Always active in game modes)
     const managementPhases = [GameState.ASSET_INVENTORY, GameState.PATCH_MGMT, GameState.ACCESS_MGMT, GameState.BCM_DR];

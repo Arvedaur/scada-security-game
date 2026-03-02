@@ -93,11 +93,20 @@ const AccessPhase = {
         header.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="margin:0; color:var(--retro-green); text-shadow:0 0 15px var(--retro-green);">ACCESS MANAGEMENT REVIEW</h2>
-                <h2 style="margin:0; color:white; text-shadow:0 0 5px var(--retro-green);">SCORE: ${player.score}</h2>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <h2 style="margin:0; color:white; text-shadow:0 0 5px var(--retro-green);">SCORE: ${player.score}</h2>
+                    <div id="access-help-btn" style="width:30px; height:30px; border:2px solid var(--retro-green); color:var(--retro-green); display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; font-size:20px;">?</div>
+                </div>
             </div>
             <p style="color:var(--retro-green);">Review pending access requests. Approve legitimate users (Engineer/Site Manager) with valid emails. Reject violations.</p>
         `;
         panel.appendChild(header);
+
+        // Add help click handler
+        setTimeout(() => {
+            const btn = document.getElementById("access-help-btn");
+            if (btn) btn.onclick = () => HelpSystem.showHelp();
+        }, 0);
 
         // CONTENT
         const content = document.createElement("div");

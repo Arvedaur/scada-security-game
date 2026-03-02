@@ -19,12 +19,35 @@ const InventoryPhase = {
         panel.style.borderWidth = "4px";
         panel.style.boxShadow = "0 0 20px var(--retro-green)";
 
+        const titleContainer = document.createElement("div");
+        titleContainer.style.display = "flex";
+        titleContainer.style.justifyContent = "space-between";
+        titleContainer.style.alignItems = "center";
+        titleContainer.style.marginBottom = "20px";
+
         const title = document.createElement("h2");
         title.innerText = "CRITICAL ASSET REGISTER (VERIFIED)";
         title.style.color = "var(--retro-green)";
         title.style.textShadow = "0 0 15px var(--retro-green)";
-        title.style.marginBottom = "20px";
-        panel.appendChild(title);
+        title.style.margin = "0";
+        titleContainer.appendChild(title);
+
+        const helpBtn = document.createElement("div");
+        helpBtn.innerText = "?";
+        helpBtn.style.width = "40px";
+        helpBtn.style.height = "40px";
+        helpBtn.style.border = "2px solid var(--retro-green)";
+        helpBtn.style.color = "var(--retro-green)";
+        helpBtn.style.display = "flex";
+        helpBtn.style.justifyContent = "center";
+        helpBtn.style.alignItems = "center";
+        helpBtn.style.cursor = "pointer";
+        helpBtn.style.fontWeight = "bold";
+        helpBtn.style.fontSize = "24px";
+        helpBtn.onclick = () => HelpSystem.showHelp();
+        titleContainer.appendChild(helpBtn);
+
+        panel.appendChild(titleContainer);
 
         if (player.inventory.length === 0) {
             const msg = document.createElement("p");
