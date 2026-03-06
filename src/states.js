@@ -14,7 +14,8 @@ const GameState = {
   ACCESS_MGMT: "ACCESS_MGMT",
   BCM_DR: "BCM_DR",
   OPGW: "OPGW",
-  SCADA_INTRO: "SCADA_INTRO"
+  SCADA_INTRO: "SCADA_INTRO",
+  RESULTS: "RESULTS"
 };
 
 // Utility for Non-Blocking Notifications
@@ -35,32 +36,57 @@ window.showStatusMessage = (msg, duration = 3000) => {
   }, duration);
 };
 
-window.showDecisionDialog = (title, msg, onConfirm, onCancel) => {
+window.showDecisionDialog = (title, msg, onConfirm, onCancelLabel) => {
   const ui = document.getElementById("ui-layer");
+  const wasHidden = ui.classList.contains("hidden");
+  ui.classList.remove("hidden"); // Ensure visible for dialog
+
   const overlay = document.createElement("div");
   overlay.style = "position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:1000; border:2px solid #00ff00;";
 
+  const cancelLabel = (typeof onCancelLabel === 'string') ? onCancelLabel : "CANCEL";
+
   overlay.innerHTML = `
-        <div class="panel" style="max-width:400px; height:auto; padding:30px; text-align:center;">
-            <h2 style="color:#ff0000; margin-top:0;">${title}</h2>
-            <p>${msg}</p>
+        <div class="panel" style="max-width:500px; height:auto; padding:30px; text-align:center; border-color: #39ff14;">
+            <h2 style="color:#39ff14; margin-top:0; font-family: 'Courier New', monospace;">${title}</h2>
+            <p style="color:#fff; line-height: 1.6;">${msg}</p>
             <div style="margin-top:20px; display:flex; justify-content:center; gap:10px;">
-                <button id="dia-cancel">CANCEL</button>
-                <button id="dia-confirm" style="border-color:#00ff00; color:#00ff00;">PROCEED</button>
+                <button id="dia-cancel" style="border-color:#fff; color:#fff;">${cancelLabel}</button>
+                <button id="dia-confirm" style="border-color:#39ff14; color:#39ff14;">PROCEED</button>
             </div>
         </div>
     `;
 
   ui.appendChild(overlay);
 
+  // If onCancelLabel is NOT provided or null, we might only want one button
+  if (!onCancelLabel && onCancelLabel !== "") {
+    // Default mode: two buttons
+  }
+
+  const closeDialog = () => {
+    overlay.remove();
+    // Re-hide ui-layer if we are in a canvas-based state
+    const DOM_STATES = ["ASSET_INVENTORY", "PATCH_MGMT", "ACCESS_MGMT", "BCM_DR"];
+    const isDOMState = DOM_STATES.some(s => GameState[s] === window.currentState);
+    if (!isDOMState) {
+      ui.classList.add("hidden");
+    }
+  };
+
   document.getElementById("dia-cancel").onclick = () => {
-    overlay.remove();
-    if (onCancel) onCancel();
+    closeDialog();
+    if (typeof onCancelLabel === 'function') onCancelLabel();
   };
-  document.getElementById("dia-confirm").onclick = () => {
-    overlay.remove();
-    onConfirm();
-  };
+
+  if (!onConfirm) {
+    document.getElementById("dia-confirm").style.display = "none";
+  } else {
+    document.getElementById("dia-confirm").onclick = () => {
+      closeDialog();
+      onConfirm();
+    };
+  }
 };
 
 // Global State

@@ -29,11 +29,11 @@ const AccessPhase = {
             const level = levels[Math.floor(Math.random() * levels.length)];
 
             // Generate Name + Email
-            const fnames = ["john", "jane", "alice", "bob", "ev", "mallory", "charlie"];
-            const lnames = ["doe", "smith", "hacker", "white", "black", "admin"];
+            const fnames = ["john", "jane", "alice", "bob", "sarah", "mike", "joe", "dave"];
+            const lnames = ["doe", "smith", "white", "black", "wilson", "brown"];
             const fn = fnames[Math.floor(Math.random() * fnames.length)];
             const ln = lnames[Math.floor(Math.random() * lnames.length)];
-            const domains = ["company.com", "partner.org", "unknown.net", "hacker.site"];
+            const domains = ["company.com", "partner.org", "internal-grid.net", "service-contractor.com"];
             const domain = domains[Math.floor(Math.random() * domains.length)];
 
             // Format check (sometimes invalid format)
@@ -140,6 +140,7 @@ const AccessPhase = {
             btn.style.textAlign = "left";
             btn.style.borderColor = "var(--retro-green)";
             btn.style.borderWidth = "2px";
+            btn.style.fontSize = "18px";
             btn.style.color = pendingCount === 0 ? "#555" : "var(--retro-green)";
             btn.innerText = `${pendingCount === 0 ? "[DONE]" : "[PENDING]"} ${asset.name} (${pendingCount})`;
 
@@ -190,7 +191,7 @@ const AccessPhase = {
     },
 
     renderRequestList(asset, container) {
-        container.innerHTML = `<h3 style='color:var(--neon-green);'>Requests for ${asset.name}</h3>`;
+        container.innerHTML = `<h3 style='color:var(--neon-green); font-size: 1.3em;'>Requests for ${asset.name}</h3>`;
 
         const requests = this.generatedRequests[asset.id];
 
@@ -209,8 +210,8 @@ const AccessPhase = {
             card.style.background = "rgba(0, 251, 255, 0.05)";
 
             card.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 5px; color:var(--neon-green);">User: ${req.email}</div>
-                <div style="font-size: 0.9em; margin-bottom: 10px; color:#fff;">
+                <div style="font-weight: bold; margin-bottom: 5px; color:var(--neon-green); font-size: 20px;">User: ${req.email}</div>
+                <div style="font-size: 1.1em; margin-bottom: 10px; color:#fff;">
                     Role: ${req.role} | Level: ${req.level}
                 </div>
             `;

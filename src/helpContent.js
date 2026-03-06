@@ -48,6 +48,6 @@ const HelpSystem = {
         const info = this.content[state] || { title: "SYSTEM HELP", text: "No specific help available for this section." };
 
         // Use a simple alert or status message for now, or create a custom modal
-        showDecisionDialog(info.title, info.text, () => { }, "CLOSE HELP");
+        showDecisionDialog(info.title, info.text, null, "CLOSE HELP");
     }
 };

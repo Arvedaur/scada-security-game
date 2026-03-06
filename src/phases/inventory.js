@@ -67,7 +67,7 @@ const InventoryPhase = {
             table.style.width = "100%";
             table.style.borderCollapse = "collapse";
             table.style.fontFamily = "monospace";
-            table.style.fontSize = "14px";
+            table.style.fontSize = "18px";
 
             const thead = document.createElement("thead");
             thead.style.background = "rgba(57, 255, 20, 0.1)";
@@ -75,13 +75,13 @@ const InventoryPhase = {
             thead.style.top = "0";
             thead.innerHTML = `
                 <tr>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">ID</th>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">ASSET NAME</th>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">VENDOR</th>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">AGE</th>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">IP ADDR</th>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">MAC ADDR</th>
-                    <th style="padding:12px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">FIRMWARE</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">ID</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">ASSET NAME</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">VENDOR</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">AGE</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">IP ADDR</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">MAC ADDR</th>
+                    <th style="padding:15px; border:1px solid var(--retro-green); color:var(--retro-green); text-align:left;">FIRMWARE</th>
                 </tr>
             `;
             table.appendChild(thead);
@@ -92,13 +92,13 @@ const InventoryPhase = {
                 tr.style.borderBottom = "1px solid rgba(255, 255, 255, 0.1)";
                 const d = item.details || { vendor: "Unknown", age: "N/A", fw: "N/A", ip: "N/A", mac: "N/A" };
                 tr.innerHTML = `
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:#fff;">${item.id}</td>
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:var(--neon-cyan);">${item.name}</td>
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:#fff;">${d.vendor}</td>
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:#aaa;">${d.age}</td>
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:var(--neon-yellow);">${d.ip}</td>
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:#fff;">${d.mac}</td>
-                    <td style="padding:10px; border:1px solid rgba(57, 255, 20, 0.2); color:var(--neon-cyan);">${d.fw}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:#fff;">${item.id}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:var(--neon-cyan);">${item.name}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:#fff;">${d.vendor}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:#aaa;">${d.age}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:var(--neon-yellow);">${d.ip}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:#fff;">${d.mac}</td>
+                    <td style="padding:12px; border:1px solid rgba(57, 255, 20, 0.2); color:var(--neon-cyan);">${d.fw}</td>
                 `;
                 tbody.appendChild(tr);
             });

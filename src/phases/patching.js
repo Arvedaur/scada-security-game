@@ -155,6 +155,7 @@ const PatchingPhase = {
             btn.style.borderWidth = "2px";
             btn.style.marginBottom = "5px";
             btn.style.color = isDone ? "#555" : "var(--retro-green)";
+            btn.style.fontSize = "18px";
             if (this.selectedAssetId === asset.id) {
                 btn.style.background = "rgba(0, 255, 0, 0.1)";
             }
@@ -180,8 +181,8 @@ const PatchingPhase = {
             if (this.processedAssets.has(selectedAsset.id)) {
                 details.innerHTML += `
                     <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:var(--retro-green); border:1px dashed var(--retro-green); background:rgba(0,255,0,0.05);">
-                        <div style="font-size:24px; font-weight:bold; margin-bottom:10px;">SYSTEM SECURED</div>
-                        <div style="font-size:14px;">PATCH DEPLOYED SUCCESSFULLY TO ${selectedAsset.name.toUpperCase()}</div>
+                        <div style="font-size:28px; font-weight:bold; margin-bottom:10px;">SYSTEM SECURED</div>
+                        <div style="font-size:18px;">PATCH DEPLOYED SUCCESSFULLY TO ${selectedAsset.name.toUpperCase()}</div>
                     </div>
                 `;
             } else {
@@ -201,11 +202,11 @@ const PatchingPhase = {
                         </div>
                         <div class="patch-card-body">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                                <div style="color:var(--retro-green); font-size: 14px;">CVSS: <span style="color:#fff;">${patch.cvss}</span></div>
-                                <div style="color:var(--retro-green); font-size: 14px;">Risk Score: <span style="color:#fff;">${risk}</span></div>
+                                <div style="color:var(--retro-green); font-size: 18px;">CVSS: <span style="color:#fff;">${patch.cvss}</span></div>
+                                <div style="color:var(--retro-green); font-size: 18px;">Risk Score: <span style="color:#fff;">${risk}</span></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                                <div style="color:var(--retro-green); font-size: 14px;">Downtime: <span style="color:#fff;">${patch.downtime}m</span></div>
+                                <div style="color:var(--retro-green); font-size: 18px;">Downtime: <span style="color:#fff;">${patch.downtime}m</span></div>
                                 <div style="color:var(--retro-green); font-size: 14px;">Sig: <span style="color:#fff;">${patch.official ? 'OFFICIAL_VENDOR_SIG' : 'UNSIGNED_COMMUNITY'}</span></div>
                             </div>
                         </div>

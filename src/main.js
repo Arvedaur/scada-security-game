@@ -26,7 +26,7 @@ const navButtons = [
     { id: "BCM", label: "[ BCM / DR ]", state: GameState.BCM_DR, x: 1300, y: 20, w: 350, h: 60, color: "#39ff14" }
 ];
 
-const helpButton = { id: "HELP", x: 1700, y: 25, w: 50, h: 50 };
+const helpButton = { id: "HELP", x: 1680, y: 25, w: 50, h: 50 };
 
 // Helper to map State -> Key for Assets
 const AppStateMap = {
@@ -112,12 +112,12 @@ function isInside(obj, x, y) {
 function renderHUD() {
     // Top Bar
     ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
-    ctx.fillRect(0, 0, canvas.width, 100);
+    ctx.fillRect(0, 0, canvas.width, 94);
 
     // Glowing thick border for HUD
     ctx.strokeStyle = "#39ff14";
     ctx.lineWidth = 6;
-    ctx.strokeRect(10, 10, canvas.width - 20, 100);
+    ctx.strokeRect(10, 10, canvas.width - 20, 84);
 
     // Text (Operator & Score) positioned in Top Right
     ctx.font = "bold 20px monospace";
@@ -125,11 +125,12 @@ function renderHUD() {
 
     // OP Name
     ctx.fillStyle = "#39ff14";
-    ctx.fillText(`OPERATOR: ${player.name || "UNAUTHORIZED"}`, canvas.width - 40, 45);
+    ctx.fillText(player.name || "UNAUTHORIZED", canvas.width - 25, 35);
 
     // Score
-    ctx.fillStyle = "white";
-    ctx.fillText(`SCORE: ${player.score.toString().padStart(6, '0')}`, canvas.width - 40, 75);
+    ctx.fillStyle = "#ff2d44";
+    ctx.font = "bold 18px monospace";
+    ctx.fillText(`SCORE: ${player.score.toString().padStart(6, '0')}`, canvas.width - 25, 60);
 
     // Nav Buttons
     navButtons.forEach(btn => {
@@ -165,8 +166,8 @@ function renderHUD() {
     ctx.textAlign = "center";
     ctx.font = "bold 34px monospace";
     ctx.lineWidth = 3;
-    ctx.strokeStyle = hHelp ? "#fff" : "var(--retro-green)";
-    ctx.fillStyle = hHelp ? "#fff" : "var(--retro-green)";
+    ctx.strokeStyle = hHelp ? "#fff" : "#39ff14";
+    ctx.fillStyle = hHelp ? "#fff" : "#39ff14";
 
     ctx.strokeRect(helpButton.x, helpButton.y, helpButton.w, helpButton.h);
     ctx.fillText("?", helpButton.x + helpButton.w / 2, helpButton.y + helpButton.h / 2 + 12);
@@ -383,8 +384,7 @@ window.addEventListener("keydown", (e) => {
     else if (currentState === GameState.STORY) {
         if (e.code === "Space") {
             if (typeof storyState !== 'undefined' && storyState.complete) {
-                currentState = GameState.INTRO;
-                initIntro();
+                currentState = GameState.SCADA_INTRO;
             } else {
                 // Skip animation
                 if (typeof storyState !== 'undefined') {
@@ -567,7 +567,8 @@ const DOM_STATES = [
     GameState.ASSET_INVENTORY,
     GameState.PATCH_MGMT,
     GameState.ACCESS_MGMT,
-    GameState.BCM_DR
+    GameState.BCM_DR,
+    GameState.RESULTS
 ];
 
 let lastState = null;
@@ -599,6 +600,9 @@ function gameLoop() {
                 case GameState.BCM_DR:
                     if (!BCMPhase.initialized) { BCMPhase.init(); BCMPhase.initialized = true; }
                     BCMPhase.render();
+                    break;
+                case GameState.RESULTS:
+                    ResultsPhase.render();
                     break;
             }
         }
