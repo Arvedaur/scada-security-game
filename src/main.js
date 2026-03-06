@@ -43,43 +43,51 @@ const subPageAssets = {
     WTG: {
         bg: "assets/images/WTG.png",
         items: [
-            { id: "W_PLC", name: "Turbine PLC", x: 80, y: 110, w: 350, h: 80, points: 20, collected: false, details: { vendor: "CyberLogic OT", age: "4 years", fw: "v3.1.2-stable", ip: "10.10.1.12", mac: "00:1A:2B:3C:4D:5E" } },
-            { id: "W_SW", name: "Turbine Switch", x: 80, y: 245, w: 350, h: 80, points: 15, collected: false, details: { vendor: "Nexus OT Systems", age: "2 years", fw: "OS v1.4.0", ip: "10.10.1.5", mac: "00:1A:2B:3C:4D:F2" } },
-            { id: "W_CMU", name: "Condition Monitoring Unit", x: 80, y: 440, w: 350, h: 100, points: 25, collected: false, details: { vendor: "Aether Control", age: "5 years", fw: "v5.0.1", ip: "10.10.1.20", mac: "00:1A:2B:3C:4D:08" } },
-            { id: "W_MOD1", name: "Controller Module A", x: 645, y: 140, w: 160, h: 300, points: 10, collected: false, details: { vendor: "Titan Dynamics", age: "3 years", fw: "v2.2.0", ip: "10.10.1.101", mac: "00:1A:2B:3C:4D:A1" } },
-            { id: "W_MOD2", name: "Controller Module B", x: 645, y: 440, w: 160, h: 300, points: 10, collected: false, details: { vendor: "Titan Dynamics", age: "3 years", fw: "v2.2.0", ip: "10.10.1.102", mac: "00:1A:2B:3C:4D:A2" } }
+            { id: "W_PLC", name: "Turbine PLC", x: 151, y: 192, w: 749, h: 103, points: 20, collected: false, details: { vendor: "CyberLogic OT", age: "4 years", fw: "v3.1.2-stable", ip: "10.10.1.12", mac: "00:1A:2B:3C:4D:5E" } },
+            { id: "W_SW", name: "Turbine Switch", x: 134, y: 308, w: 719, h: 103, points: 15, collected: false, details: { vendor: "Nexus OT Systems", age: "2 years", fw: "OS v1.4.0", ip: "10.10.1.5", mac: "00:1A:2B:3C:4D:F2" } },
+            { id: "W_CMU", name: "Condition Monitoring Unit", x: 128, y: 496, w: 732, h: 145, points: 25, collected: false, details: { vendor: "Aether Control", age: "5 years", fw: "v5.0.1", ip: "10.10.1.20", mac: "00:1A:2B:3C:4D:08" } },
+            { id: "W_ROUTER", name: "Turbine Router", x: 119, y: 862, w: 685, h: 127, points: 15, collected: false, details: { vendor: "Nexus Systems", age: "3 years", fw: "OS v1.2", ip: "10.10.1.1", mac: "00:1A:2B:3C:4D:01" } },
+            { id: "W_PC", name: "WTG Local PC", x: 879, y: 265, w: 350, h: 294, points: 40, collected: false, details: { vendor: "Titan Dynamics", age: "2 years", fw: "WinOT v10.5", ip: "10.10.1.50", mac: "00:1A:2B:3C:4D:E1" } },
+            { id: "W_RELAY", name: "WTG Protection Relays", x: 1187, y: 173, w: 417, h: 463, points: 30, collected: false, details: { vendor: "Aether Control", age: "4 years", fw: "v2.2.0", ip: "10.10.1.100", mac: "00:1A:2B:3C:4D:F9" } }
         ]
     },
     BESS: {
         bg: "assets/images/BESS.png",
         items: [
-            { id: "B_EMS", name: "BESS EMS Server", x: 110, y: 180, w: 300, h: 80, points: 30, collected: false, details: { vendor: "GridStream Industrial", age: "1 year", fw: "v8.4.1", ip: "10.20.5.10", mac: "00:1A:2B:7E:4D:10" } },
-            { id: "B_BMS1", name: "BMS Controller #1", x: 110, y: 265, w: 300, h: 80, points: 15, collected: false, details: { vendor: "Flux Energy", age: "3 years", fw: "v2.9.0", ip: "10.20.5.21", mac: "00:1A:2B:7E:4D:21" } },
-            { id: "B_BMS2", name: "BMS Controller #2", x: 110, y: 350, w: 300, h: 80, points: 15, collected: false, details: { vendor: "Flux Energy", age: "3 years", fw: "v2.9.0", ip: "10.20.5.22", mac: "00:1A:2B:7E:4D:22" } },
-            { id: "B_MET", name: "Smart Metering Unit", x: 110, y: 520, w: 300, h: 200, points: 20, collected: false, details: { vendor: "Quantec Power", age: "2 years", fw: "v1.12", ip: "10.20.5.50", mac: "00:1A:2B:7E:4D:50" } },
-            { id: "B_VPN", name: "Vendor VPN Gateway", x: 655, y: 185, w: 250, h: 100, points: 30, collected: false, details: { vendor: "SecureLink OT", age: "1 year", fw: "v4.5.3-sec", ip: "10.20.10.1", mac: "00:1A:2B:7E:FF:01" } },
-            { id: "B_FW", name: "Site OT Firewall", x: 655, y: 295, w: 250, h: 100, points: 35, collected: false, details: { vendor: "Nexus OT Systems", age: "2 years", fw: "OS v2.1.0", ip: "10.20.10.5", mac: "00:1A:2B:7E:FF:05" } },
-            { id: "B_SW", name: "Industrial OT Switch", x: 655, y: 405, w: 250, h: 100, points: 20, collected: false, details: { vendor: "Nexus OT Systems", age: "4 years", fw: "OS v1.8.2", ip: "10.20.10.10", mac: "00:1A:2B:7E:FF:10" } },
-            { id: "B_GW", name: "SCADA Gateway", x: 655, y: 515, w: 250, h: 100, points: 25, collected: false, details: { vendor: "CyberLogic OT", age: "5 years", fw: "v4.0.0", ip: "10.20.10.20", mac: "00:1A:2B:7E:FF:20" } }
+            { id: "B_HIST", name: "Historian Agent", x: 1202, y: 704, w: 586, h: 92, points: 25, collected: false, details: { vendor: "DataStream Industrial", age: "1 year", fw: "v3.1", ip: "10.20.10.30", mac: "00:1A:2B:7E:FF:30" } },
+            { id: "B_GW", name: "SCADA Gateway", x: 1217, y: 648, w: 556, h: 53, points: 25, collected: false, details: { vendor: "CyberLogic OT", age: "5 years", fw: "v4.0.0", ip: "10.20.10.20", mac: "00:1A:2B:7E:FF:20" } },
+            { id: "B_SW", name: "Switch", x: 1245, y: 496, w: 530, h: 92, points: 20, collected: false, details: { vendor: "Nexus OT Systems", age: "4 years", fw: "OS v1.8.2", ip: "10.20.10.10", mac: "00:1A:2B:7E:FF:10" } },
+            { id: "B_FW", name: "Firewall", x: 1236, y: 379, w: 536, h: 76, points: 35, collected: false, details: { vendor: "Nexus OT Systems", age: "2 years", fw: "OS v2.1.0", ip: "10.20.10.5", mac: "00:1A:2B:7E:FF:05" } },
+            { id: "B_VPN", name: "Vendor VPN", x: 1217, y: 264, w: 568, h: 85, points: 30, collected: false, details: { vendor: "SecureLink OT", age: "1 year", fw: "v4.5.3-sec", ip: "10.20.10.1", mac: "00:1A:2B:7E:FF:01" } },
+            { id: "B_BMS_C1", name: "BMS Controller", x: 204, y: 507, w: 638, h: 82, points: 15, collected: false, details: { vendor: "Flux Energy", age: "3 years", fw: "v2.9.0", ip: "10.20.5.21", mac: "00:1A:2B:7E:4D:21" } },
+            { id: "B_MET", name: "Smart Meter", x: 211, y: 588, w: 423, h: 206, points: 20, collected: false, details: { vendor: "Quantec Power", age: "2 years", fw: "v1.12", ip: "10.20.5.50", mac: "00:1A:2B:7E:4D:50" } },
+            { id: "B_EMS", name: "EMS Server", x: 182, y: 288, w: 601, h: 37, points: 30, collected: false, details: { vendor: "GridStream Industrial", age: "1 year", fw: "v8.4.1", ip: "10.20.5.10", mac: "00:1A:2B:7E:4D:10" } },
+            { id: "B_BMS_C2", name: "BMS Controller", x: 211, y: 443, w: 584, h: 56, points: 15, collected: false, details: { vendor: "Flux Energy", age: "3 years", fw: "v2.9.0", ip: "10.20.5.22", mac: "00:1A:2B:7E:4D:22" } },
+            { id: "B_BMS_C3", name: "BMS Controller", x: 194, y: 345, w: 591, h: 79, points: 15, collected: false, details: { vendor: "Flux Energy", age: "3 years", fw: "v2.9.0", ip: "10.20.5.23", mac: "00:1A:2B:7E:4D:23" } },
+            { id: "B_BU", name: "Backup Unit", x: 843, y: 480, w: 291, h: 273, points: 25, collected: false, details: { vendor: "Aether Control", age: "4 years", fw: "v1.0", ip: "10.20.5.100", mac: "00:1A:2B:7E:4D:B2" } }
         ]
     },
     SOLAR: {
         bg: "assets/images/Solar.png",
         items: [
-            { id: "S_INV_C1", name: "Inverter Controller 1", x: 35, y: 85, w: 215, h: 160, points: 20, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.11", mac: "00:1A:2B:9F:4D:11" } },
-            { id: "S_INV_C2", name: "Inverter Controller 2", x: 35, y: 255, w: 215, h: 160, points: 20, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.12", mac: "00:1A:2B:9F:4D:12" } },
-            { id: "S_SRV", name: "Solar SCADA Server", x: 295, y: 85, w: 265, h: 130, points: 30, collected: false, details: { vendor: "CyberLogic OT", age: "1 year", fw: "v2.8-cloud", ip: "10.30.5.10", mac: "00:1A:2B:9F:4D:A1" } },
-            { id: "S_RTU", name: "Plant RTU", x: 295, y: 330, w: 265, h: 100, points: 25, collected: false, details: { vendor: "Aether Control", age: "6 years", fw: "v3.9.1", ip: "10.30.5.15", mac: "00:1A:2B:9F:4D:B2" } },
-            { id: "S_MET", name: "Production Power Meter", x: 295, y: 485, w: 265, h: 100, points: 15, collected: false, details: { vendor: "Quantec Power", age: "4 years", fw: "v2.0", ip: "10.30.5.20", mac: "00:1A:2B:9F:4D:C3" } },
-            { id: "S_SW", name: "Field Network Switch", x: 585, y: 540, w: 220, h: 140, points: 20, collected: false, details: { vendor: "Nexus OT Systems", age: "2 years", fw: "OS v1.5.1", ip: "10.30.10.10", mac: "00:1A:2B:9F:4D:D4" } },
-            { id: "S_RAG", name: "Remote Access Gateway", x: 585, y: 710, w: 220, h: 140, points: 30, collected: false, details: { vendor: "SecureLink OT", age: "2 years", fw: "v3.1", ip: "10.30.10.1", mac: "00:1A:2B:9F:4D:E5" } }
+            { id: "S_RAG", name: "Remote Access Gateway", x: 1082, y: 714, w: 450, h: 96, points: 30, collected: false, details: { vendor: "SecureLink OT", age: "2 years", fw: "v3.1", ip: "10.30.10.1", mac: "00:1A:2B:9F:4D:E5" } },
+            { id: "S_SW", name: "Switch", x: 1082, y: 574, w: 450, h: 96, points: 20, collected: false, details: { vendor: "Nexus OT Systems", age: "2 years", fw: "OS v1.5.1", ip: "10.30.10.10", mac: "00:1A:2B:9F:4D:D4" } },
+            { id: "S_PC", name: "Local PC", x: 1102, y: 277, w: 431, h: 346, points: 40, collected: false, details: { vendor: "Titan Dynamics", age: "1 year", fw: "WinOT v11.0", ip: "10.30.10.50", mac: "00:1A:2B:9F:4D:EE" } },
+            { id: "S_SRV", name: "Solar SCADA Server", x: 563, y: 179, w: 496, h: 150, points: 30, collected: false, details: { vendor: "CyberLogic OT", age: "1 year", fw: "v2.8-cloud", ip: "10.30.5.10", mac: "00:1A:2B:9F:4D:A1" } },
+            { id: "S_RTU", name: "RTU", x: 577, y: 446, w: 466, h: 74, points: 25, collected: false, details: { vendor: "Aether Control", age: "6 years", fw: "v3.9.1", ip: "10.30.5.15", mac: "00:1A:2B:9F:4D:B2" } },
+            { id: "S_MET", name: "Power Meter", x: 563, y: 561, w: 512, h: 191, points: 15, collected: false, details: { vendor: "Quantec Power", age: "4 years", fw: "v2.0", ip: "10.30.5.20", mac: "00:1A:2B:9F:4D:C3" } },
+            { id: "S_INV1", name: "Inv 1", x: 54, y: 600, w: 405, h: 68, points: 15, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.11", mac: "00:1A:2B:9F:4D:11" } },
+            { id: "S_INV2", name: "Inv 2", x: 102, y: 530, w: 381, h: 65, points: 15, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.12", mac: "00:1A:2B:9F:4D:12" } },
+            { id: "S_INV3", name: "Inv 3", x: 49, y: 441, w: 411, h: 75, points: 15, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.13", mac: "00:1A:2B:9F:4D:13" } },
+            { id: "S_CTRL1", name: "Controller 1", x: 45, y: 357, w: 446, h: 67, points: 20, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.21", mac: "00:1A:2B:9F:4D:C1" } },
+            { id: "S_CTRL2", name: "Controller 2", x: 40, y: 188, w: 444, h: 73, points: 20, collected: false, details: { vendor: "Helios OT", age: "3 years", fw: "v5.2", ip: "10.30.2.22", mac: "00:1A:2B:9F:4D:C2" } }
         ]
     },
     OPGW: {
         bg: "assets/images/OPGW.png",
         items: [
-            { id: "O_SDH1", name: "SDH Module 1", x: 325, y: 310, w: 110, h: 160, points: 25, collected: false, details: { vendor: "OptiCore Networks", age: "5 years", fw: "v12.4.L", ip: "172.16.50.11", mac: "00:1A:3C:4D:5E:01" } },
-            { id: "O_SDH2", name: "SDH Module 2", x: 325, y: 495, w: 110, h: 160, points: 25, collected: false, details: { vendor: "OptiCore Networks", age: "5 years", fw: "v12.4.L", ip: "172.16.50.12", mac: "00:1A:3C:4D:5E:02" } },
+            { id: "O_SDH1", name: "SDH 1", x: 631, y: 322, w: 284, h: 189, points: 25, collected: false, details: { vendor: "OptiCore Networks", age: "5 years", fw: "v12.4.L", ip: "172.16.50.11", mac: "00:1A:3C:4D:5E:01" } },
+            { id: "O_SDH2", name: "SDH 2", x: 634, y: 514, w: 233, h: 175, points: 25, collected: false, details: { vendor: "OptiCore Networks", age: "5 years", fw: "v12.4.L", ip: "172.16.50.12", mac: "00:1A:3C:4D:5E:02" } },
             { id: "O_TERM", name: "Fiber Termination Tray", x: 460, y: 320, w: 220, h: 330, points: 30, collected: false, details: { vendor: "TeraLink Physical", age: "8 years", fw: "N/A", ip: "Passive", mac: "N/A" } }
         ]
     }
@@ -179,21 +187,36 @@ function renderHUD() {
     ctx.fillText(`X:${Math.round(mouseX)} Y:${Math.round(mouseY)}`, mouseX + 22, mouseY + 32);
 
     if (window.debugStart) {
-        const w = Math.round(mouseX - window.debugStart.x);
-        const h = Math.round(mouseY - window.debugStart.y);
+        const x1 = window.debugStart.x;
+        const y1 = window.debugStart.y;
+        const x2 = Math.round(mouseX);
+        const y2 = Math.round(mouseY);
+
+        const rectX = Math.min(x1, x2);
+        const rectY = Math.min(y1, y2);
+        const finalW = Math.abs(x1 - x2);
+        const finalH = Math.abs(y1 - y2);
+
         ctx.fillStyle = "#00ffff"; // Cyan for W/H
-        ctx.fillText(`W:${w} H:${h}`, mouseX + 22, mouseY + 52);
-        ctx.fillText(`ST: ${window.debugStart.x}, ${window.debugStart.y}`, mouseX + 22, mouseY + 68);
+        ctx.fillText(`X:${rectX} Y:${rectY}`, mouseX + 22, mouseY + 52);
+        ctx.fillText(`W:${finalW} H:${finalH}`, mouseX + 22, mouseY + 68);
 
         // Visual rectangle trace
         ctx.strokeStyle = "rgba(0, 255, 255, 0.5)";
         ctx.setLineDash([5, 5]);
-        ctx.strokeRect(window.debugStart.x, window.debugStart.y, mouseX - window.debugStart.x, mouseY - window.debugStart.y);
+        ctx.strokeRect(rectX, rectY, finalW, finalH);
         ctx.setLineDash([]);
     } else {
         ctx.fillStyle = "#ffffff";
         ctx.font = "10px monospace";
         ctx.fillText("RIGHT-CLICK FOR W/H START", mouseX + 22, mouseY + 52);
+    }
+
+    // Copy hint
+    if (window.debugStart) {
+        ctx.fillStyle = "#00ff00";
+        ctx.font = "bold 12px monospace";
+        ctx.fillText("PRESS 'C' TO COPY [X,Y,W,H]", mouseX + 22, mouseY + 85);
     }
 }
 
@@ -307,10 +330,10 @@ function renderGenericSubPage(key) {
             const h = isInside(item, mouseX, mouseY);
 
             // Draw item box
-            ctx.fillStyle = h ? "rgba(0, 255, 0, 0.2)" : "rgba(0, 0, 0, 0.5)";
+            ctx.fillStyle = h ? "rgba(57, 255, 20, 0.4)" : "rgba(57, 255, 20, 0.1)";
             ctx.fillRect(item.x, item.y, item.w, item.h);
 
-            ctx.strokeStyle = h ? "#fff" : "#00ff00";
+            ctx.strokeStyle = h ? "#fff" : "#39ff14";
             ctx.lineWidth = 2;
             ctx.strokeRect(item.x, item.y, item.w, item.h);
 
@@ -391,6 +414,32 @@ window.addEventListener("keydown", (e) => {
             window.gameStarted = true;
         }
     }
+
+    // Copy Coordinates to Clipboard when 'C' is pressed
+    if (e.key.toLowerCase() === 'c' && window.debugStart) {
+        const x1 = window.debugStart.x;
+        const y1 = window.debugStart.y;
+        const x2 = Math.round(mouseX);
+        const y2 = Math.round(mouseY);
+
+        // Calculate the rectangle starting from the top-leftmost point
+        const finalX = Math.min(x1, x2);
+        const finalY = Math.min(y1, y2);
+        const finalW = Math.abs(x1 - x2);
+        const finalH = Math.abs(y1 - y2);
+
+        // Format as x, y, w, h
+        const results = `${finalX}, ${finalY}, ${finalW}, ${finalH}`;
+        const coordStr = `[${finalX}, ${finalY}, ${finalW}, ${finalH}]`;
+
+        navigator.clipboard.writeText(results).then(() => {
+            showStatusMessage(`COPIED: ${results}`);
+            console.log(`ASSET COORDS: x:${finalX}, y:${finalY}, w:${finalW}, h:${finalH}`);
+        }).catch(err => {
+            console.error('Could not copy to clipboard', err);
+            showStatusMessage(`FAILED TO COPY: ${results} (Check Console)`);
+        });
+    }
 });
 
 canvas.addEventListener("mousemove", (e) => {
@@ -433,6 +482,7 @@ canvas.addEventListener("click", (e) => {
     }
 
     if (currentState !== GameState.INTRO && currentState !== GameState.STORY && currentState !== GameState.LOGIN) {
+        let navClicked = false;
         navButtons.forEach(btn => {
             if (isInside(btn, x, y)) {
                 // Phase progression check
@@ -462,9 +512,13 @@ canvas.addEventListener("click", (e) => {
                     return;
                 }
 
-                if (btn.state) currentState = btn.state;
+                if (btn.state) {
+                    currentState = btn.state;
+                    navClicked = true;
+                }
             }
         });
+        if (navClicked) return; // Exit click handler after navigation
     }
 
     // 2. Main Page Zones
@@ -472,16 +526,18 @@ canvas.addEventListener("click", (e) => {
         if (!window.gameStarted) return;
 
         if (typeof systemZones !== 'undefined') {
+            let zoneClicked = false;
             systemZones.forEach(zone => {
                 if (isInside(zone, x, y)) {
                     currentState = zone.state;
+                    zoneClicked = true;
                 }
             });
+            if (zoneClicked) return; // Exit click handler after entering a sector
         }
     }
 
     // 3. Sub-page Item Collection
-
     const currentKey = Object.keys(AppStateMap).find(key => AppStateMap[key] === currentState);
     let assetsToCheck = [];
 
@@ -495,9 +551,8 @@ canvas.addEventListener("click", (e) => {
         if (!InventoryPhase.isFrozen && !item.collected && isInside(item, mouseX, mouseY)) {
             item.collected = true;
             player.score += item.points;
-            player.phaseScores.inventory += item.points; // Track Phase Score
+            player.phaseScores.inventory += item.points;
             player.inventory.push(item);
-            // Optional: Play sound
         }
     });
 });

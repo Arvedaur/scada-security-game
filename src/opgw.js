@@ -37,10 +37,10 @@ function renderOPGW(ctx, canvas) {
             const h = isInside(item, mouseX, mouseY);
 
             // Draw item box
-            ctx.fillStyle = h ? "rgba(0, 255, 0, 0.2)" : "rgba(0, 0, 0, 0.5)";
+            ctx.fillStyle = h ? "rgba(57, 255, 20, 0.4)" : "rgba(57, 255, 20, 0.1)";
             ctx.fillRect(item.x, item.y, item.w, item.h);
 
-            ctx.strokeStyle = h ? "#fff" : "#00ff00";
+            ctx.strokeStyle = h ? "#fff" : "#39ff14";
             ctx.lineWidth = 2;
             ctx.strokeRect(item.x, item.y, item.w, item.h);
 

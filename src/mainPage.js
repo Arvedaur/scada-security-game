@@ -5,50 +5,50 @@ const systemZones = [
   // 🟢 WTG (Wind Farm - Top Left)
   {
     name: "WTG",
-    x: 50,
-    y: 150,
-    w: 350,
-    h: 300,
+    x: 313,
+    y: 267,
+    w: 140,
+    h: 117,
     state: GameState.WTG
   },
 
   // 🟡 BESS (Battery Storage - Middle Left)
   {
     name: "BESS",
-    x: 50,
-    y: 470,
-    w: 350,
-    h: 250,
+    x: 142,
+    y: 630,
+    w: 577,
+    h: 91,
     state: GameState.BESS
   },
 
   // 🔵 SOLAR (Solar Power - Bottom Left)
   {
     name: "SOLAR",
-    x: 50,
-    y: 750,
-    w: 400,
-    h: 280,
+    x: 272,
+    y: 944,
+    w: 294,
+    h: 58,
     state: GameState.SOLAR
   },
 
   // 🔴 SUBSTATION (Main Substation - Right)
   {
     name: "SUBSTATION",
-    x: 1200,
-    y: 400,
-    w: 600,
-    h: 450,
+    x: 1294,
+    y: 627,
+    w: 378,
+    h: 118,
     state: GameState.SUBSTATION
   },
 
   // 🟣 OPGW (Transmission Lines - Top Right)
   {
     name: "OPGW",
-    x: 1300,
-    y: 150,
-    w: 500,
-    h: 200,
+    x: 1424,
+    y: 214,
+    w: 368,
+    h: 167,
     state: GameState.OPGW
   }
 ];
