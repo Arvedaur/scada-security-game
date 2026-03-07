@@ -158,33 +158,49 @@ const AccessPhase = {
         const footer = document.createElement("div");
         footer.className = "panel-footer";
         footer.style.marginTop = "10px";
-        const proceedBtn = document.createElement("button");
-        proceedBtn.innerText = "PROCEED TO BCM / DR >>";
-        proceedBtn.style.color = "var(--neon-yellow)";
-        proceedBtn.style.borderColor = "var(--neon-yellow)";
-        proceedBtn.onclick = () => {
-            // Check if all processed?
+        const handleProceed = (nextState, initFunc) => {
             let allDone = true;
             Object.values(this.generatedRequests).flat().forEach(r => {
                 if (!r.processed) allDone = false;
             });
 
+            const finalize = () => {
+                player.progress.access = true;
+                window.currentState = nextState;
+                if (initFunc) initFunc();
+                document.getElementById("ui-layer").classList.add("hidden");
+            };
+
             if (!allDone) {
                 showDecisionDialog("UNPROCESSED REQUESTS",
                     "You have unprocessed requests. Unreviewed requests will be auto-rejected. Proceed?",
-                    () => {
-                        player.progress.access = true;
-                        currentState = GameState.BCM_DR;
-                        ui.classList.add("hidden");
-                    }
+                    finalize
                 );
             } else {
-                player.progress.access = true;
-                currentState = GameState.BCM_DR;
-                ui.classList.add("hidden");
+                finalize();
             }
         };
-        footer.appendChild(proceedBtn);
+
+        const proceedIDSBtn = document.createElement("button");
+        proceedIDSBtn.innerText = "PROCEED TO IDS MONITOR >>";
+        proceedIDSBtn.style.color = "var(--neon-yellow)";
+        proceedIDSBtn.style.borderColor = "var(--neon-yellow)";
+        proceedIDSBtn.style.marginRight = "10px";
+        proceedIDSBtn.onclick = () => handleProceed(GameState.IDS_MONITOR, () => IDSPhase.init());
+
+        const proceedBCMBtn = document.createElement("button");
+        proceedBCMBtn.innerText = "PROCEED TO BCM / DR >>";
+        proceedBCMBtn.style.color = "#39ff14";
+        proceedBCMBtn.style.borderColor = "#39ff14";
+        proceedBCMBtn.onclick = () => handleProceed(GameState.BCM_DR, () => {
+            if (typeof BCMPhase !== 'undefined') {
+                if (!BCMPhase.initialized) { BCMPhase.init(); BCMPhase.initialized = true; }
+                BCMPhase.render();
+            }
+        });
+
+        footer.appendChild(proceedIDSBtn);
+        footer.appendChild(proceedBCMBtn);
         panel.appendChild(footer);
 
         ui.appendChild(panel);

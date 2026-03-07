@@ -20,10 +20,11 @@ window.debugStart = null;
 
 // Navigation Buttons (HUD)
 const navButtons = [
-    { id: "INV", label: "[ INVENTORY ]", state: GameState.ASSET_INVENTORY, x: 100, y: 20, w: 350, h: 60, color: "#39ff14" },
-    { id: "PATCH", label: "[ PATCH MGMT ]", state: GameState.PATCH_MGMT, x: 500, y: 20, w: 350, h: 60, color: "#39ff14" },
-    { id: "ACCESS", label: "[ ACCESS MGMT ]", state: GameState.ACCESS_MGMT, x: 900, y: 20, w: 350, h: 60, color: "#39ff14" },
-    { id: "BCM", label: "[ BCM / DR ]", state: GameState.BCM_DR, x: 1300, y: 20, w: 350, h: 60, color: "#39ff14" }
+    { id: "INV", label: "[ INVENTORY ]", state: GameState.ASSET_INVENTORY, x: 50, y: 20, w: 300, h: 60, color: "#39ff14" },
+    { id: "PATCH", label: "[ PATCH MGMT ]", state: GameState.PATCH_MGMT, x: 375, y: 20, w: 300, h: 60, color: "#39ff14" },
+    { id: "ACCESS", label: "[ ACCESS MGMT ]", state: GameState.ACCESS_MGMT, x: 700, y: 20, w: 300, h: 60, color: "#39ff14" },
+    { id: "IDS", label: "[ IDS MONITOR ]", state: GameState.IDS_MONITOR, x: 1025, y: 20, w: 300, h: 60, color: "#39ff14" },
+    { id: "BCM", label: "[ BCM / DR ]", state: GameState.BCM_DR, x: 1350, y: 20, w: 300, h: 60, color: "#39ff14" }
 ];
 
 const helpButton = { id: "HELP", x: 1680, y: 25, w: 50, h: 50 };
@@ -475,7 +476,7 @@ canvas.addEventListener("click", (e) => {
     }
 
     // 1. HUD Navigation (Always active in game modes)
-    const managementPhases = [GameState.ASSET_INVENTORY, GameState.PATCH_MGMT, GameState.ACCESS_MGMT, GameState.BCM_DR];
+    const managementPhases = [GameState.ASSET_INVENTORY, GameState.PATCH_MGMT, GameState.ACCESS_MGMT, GameState.IDS_MONITOR, GameState.BCM_DR];
 
     if (managementPhases.includes(currentState)) {
         return; // Let DOM handle clicks
@@ -494,7 +495,11 @@ canvas.addEventListener("click", (e) => {
                     showStatusMessage("ERROR: PATCHING PHASE MUST BE COMPLETED FIRST");
                     return;
                 }
-                if (btn.id === "BCM" && !player.progress.access) {
+                if (btn.id === "BCM" && !player.progress.ids) {
+                    showStatusMessage("ERROR: IDS MONITORING REQUIRED BEFORE DISASTER PLANNING");
+                    return;
+                }
+                if (btn.id === "IDS" && !player.progress.access) {
                     showStatusMessage("ERROR: ACCESS CONTROL MUST BE SECURED FIRST");
                     return;
                 }
@@ -514,6 +519,7 @@ canvas.addEventListener("click", (e) => {
 
                 if (btn.state) {
                     currentState = btn.state;
+                    if (btn.id === "IDS") IDSPhase.init();
                     navClicked = true;
                 }
             }
@@ -597,6 +603,9 @@ function gameLoop() {
                     if (!AccessPhase.initialized) { AccessPhase.init(); AccessPhase.initialized = true; }
                     AccessPhase.render();
                     break;
+                case GameState.IDS_MONITOR:
+                    IDSPhase.render();
+                    break;
                 case GameState.BCM_DR:
                     if (!BCMPhase.initialized) { BCMPhase.init(); BCMPhase.initialized = true; }
                     BCMPhase.render();
@@ -605,6 +614,10 @@ function gameLoop() {
                     ResultsPhase.render();
                     break;
             }
+        }
+
+        if (lastState === GameState.IDS_MONITOR && currentState !== GameState.IDS_MONITOR) {
+            IDSPhase.stop();
         }
 
         lastState = currentState;

@@ -12,6 +12,7 @@ const GameState = {
   ASSET_INVENTORY: "ASSET_INVENTORY",
   PATCH_MGMT: "PATCH_MGMT",
   ACCESS_MGMT: "ACCESS_MGMT",
+  IDS_MONITOR: "IDS_MONITOR",
   BCM_DR: "BCM_DR",
   OPGW: "OPGW",
   SCADA_INTRO: "SCADA_INTRO",
@@ -67,7 +68,7 @@ window.showDecisionDialog = (title, msg, onConfirm, onCancelLabel) => {
   const closeDialog = () => {
     overlay.remove();
     // Re-hide ui-layer if we are in a canvas-based state
-    const DOM_STATES = ["ASSET_INVENTORY", "PATCH_MGMT", "ACCESS_MGMT", "BCM_DR"];
+    const DOM_STATES = ["ASSET_INVENTORY", "PATCH_MGMT", "ACCESS_MGMT", "IDS_MONITOR", "BCM_DR"];
     const isDOMState = DOM_STATES.some(s => GameState[s] === window.currentState);
     if (!isDOMState) {
       ui.classList.add("hidden");
@@ -109,6 +110,7 @@ window.player = {
     inventory: 0,
     patching: 0,
     access: 0,
+    ids: 0,
     bcm: 0
   },
   incidents: []
