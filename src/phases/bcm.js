@@ -2,10 +2,12 @@
 const BCMPhase = {
     backupSelections: new Map(), // assetId -> selection
     initialized: false,
+    stats: { strong: 0, weak: 0, paper: 0 },
 
     init() {
         this.backupSelections.clear();
         this.initialized = true;
+        this.stats = { strong: 0, weak: 0, paper: 0 };
     },
 
     render() {
@@ -128,9 +130,11 @@ const BCMPhase = {
             if (val === "OFFSITE_NAS" || val === "SECURE_CLOUD") {
                 player.score += 30;
                 player.phaseScores.bcm += 30;
+                this.stats.strong++;
             } else if (val === "LOCAL_SERVER" || val === "USB_DRIVE") {
                 player.score -= 15;
                 player.phaseScores.bcm -= 15;
+                this.stats.weak++;
 
                 // Incident Log
                 let assetName = player.inventory.find(a => a.id === key)?.name || "Unknown";
@@ -142,9 +146,11 @@ const BCMPhase = {
                 // Paper
                 player.score += 5;
                 player.phaseScores.bcm += 5;
+                this.stats.paper++;
             }
         });
 
+        player.bcmStats = { ...this.stats }; // Save for certificate
         currentState = GameState.RESULTS;
     }
 };

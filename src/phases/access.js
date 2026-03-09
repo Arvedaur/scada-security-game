@@ -3,11 +3,13 @@ const AccessPhase = {
     generatedRequests: {}, // assetId -> Array of requests
     processedAssets: new Set(),
     initialized: false,
+    stats: { correct: 0, incorrect: 0 },
 
     init() {
         this.generatedRequests = {};
         this.processedAssets.clear();
         this.initialized = true;
+        this.stats = { correct: 0, incorrect: 0 };
 
         // Generate mock requests for each asset
         player.inventory.forEach(asset => {
@@ -20,7 +22,7 @@ const AccessPhase = {
         const requests = [];
         const count = Math.floor(Math.random() * 3) + 1;
 
-        const roles = ["Operator", "Engineer", "Site Manager", "Accountant", "Animal Trainer"];
+        const roles = ["Operator", "Engineer", "Site Manager", "Accountant", "Animal Trainer", "Professional Seagull Manager", "Substation Chef", "Undercover AI", "Cloud Architect (Literal Cloud)", "Emergency Meme Coordinator", "Gravity Specialist"];
         const levels = ["Read-Only", "Write", "Admin"];
 
         for (let i = 0; i < count; i++) {
@@ -29,8 +31,8 @@ const AccessPhase = {
             const level = levels[Math.floor(Math.random() * levels.length)];
 
             // Generate Name + Email
-            const fnames = ["john", "jane", "alice", "bob", "sarah", "mike", "joe", "dave"];
-            const lnames = ["doe", "smith", "white", "black", "wilson", "brown"];
+            const fnames = ["john", "jane", "alice", "bob", "sarah", "mike", "joe", "dave", "kevin", "stacy", "chad", "gertrude", "barnaby"];
+            const lnames = ["doe", "smith", "white", "black", "wilson", "brown", "vanderbilt", "mcgill", "baggins"];
             const fn = fnames[Math.floor(Math.random() * fnames.length)];
             const ln = lnames[Math.floor(Math.random() * lnames.length)];
             const domains = ["company.com", "partner.org", "internal-grid.net", "service-contractor.com"];
@@ -58,6 +60,7 @@ const AccessPhase = {
             }
 
             // 4. Bad Access Level
+            // Site Managers and Engineers can have Admin/Write. Others cannot.
             if ((level === "Write" || level === "Admin") && (role !== "Engineer" && role !== "Site Manager")) {
                 isValid = false;
                 violationReason += " Excessive Privileges";
@@ -166,6 +169,7 @@ const AccessPhase = {
 
             const finalize = () => {
                 player.progress.access = true;
+                player.accessStats = { ...this.stats }; // Save stats for certificate
                 window.currentState = nextState;
                 if (initFunc) initFunc();
                 document.getElementById("ui-layer").classList.add("hidden");
@@ -204,6 +208,7 @@ const AccessPhase = {
         panel.appendChild(footer);
 
         ui.appendChild(panel);
+
     },
 
     renderRequestList(asset, container) {
@@ -271,10 +276,12 @@ const AccessPhase = {
             if (req.isValid) {
                 points = 20;
                 msg = "APPROVED: Access Granted to Valid User.";
+                this.stats.correct++;
             } else {
                 points = -20;
                 msg = `VIOLATION: Granted Access to Invalid Request.`;
                 incidentValue = `Granted Unauthorized Access to ${req.email}`;
+                this.stats.incorrect++;
 
                 msg += `\n\nWHY IT MATTERS: ${req.violationReason}`;
                 if (req.violationReason.includes("Excessive Privileges")) {
@@ -287,10 +294,12 @@ const AccessPhase = {
                 points = -10;
                 msg = "WARNING: Rejected Valid User request.";
                 incidentValue = `Rejected Valid User ${req.email}`;
+                this.stats.incorrect++;
                 msg += "\n\nWHY IT MATTERS: Blocking legitimate engineers disrupts operations (Availability impact).";
             } else {
                 points = 20;
                 msg = "BLOCKED: Successfully prevented unauthorized access.";
+                this.stats.correct++;
             }
         }
 

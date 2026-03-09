@@ -25,7 +25,7 @@ window.showStatusMessage = (msg, duration = 3000) => {
   if (!notify) {
     notify = document.createElement("div");
     notify.id = "game-notify";
-    notify.style = "position:absolute; top:20px; right:20px; background:#000; border:2px solid #00ff00; color:#00ff00; padding:15px; z-index:2000; box-shadow:0 0 10px #00ff00; font-family:monospace; max-width:300px; border-radius:4px;";
+    notify.style = "position:absolute; top:20px; right:20px; background:#000; border:2px solid #00ff00; color:#00ff00; padding:25px; z-index:2000; box-shadow:0 0 15px #00ff00; font-family:monospace; font-size: 24px; font-weight: bold; max-width:500px; border-radius:4px;";
     document.body.appendChild(notify);
   }
   notify.innerText = msg;
