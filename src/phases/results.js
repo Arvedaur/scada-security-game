@@ -1,12 +1,49 @@
 
 const ResultsPhase = {
-    leaderboard: [
-        { name: "Per E**rs", score: 2500, grade: "A++", date: "2026-03-01" },
-        { name: "CyberSentinel", score: 1150, grade: "A+", date: "2026-02-28" },
-        { name: "GridGuardian", score: 980, grade: "A", date: "2026-03-05" },
-        { name: "RootUser_01", score: 850, grade: "B+", date: "2026-03-02" },
-        { name: "TechWizard", score: 720, grade: "B", date: "2026-02-15" }
-    ],
+    loadLeaderboard() {
+        const stored = localStorage.getItem("scada_leaderboard");
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                console.error("Failed to parse leaderboard:", e);
+                return this.getDefaultLeaderboard();
+            }
+        }
+        return this.getDefaultLeaderboard();
+    },
+
+    getDefaultLeaderboard() {
+        return [
+            { name: "Per E**rs", score: 2500, grade: "A++", date: "2026-03-01" },
+            { name: "CyberSentinel", score: 1150, grade: "A+", date: "2026-02-28" },
+            { name: "GridGuardian", score: 980, grade: "A", date: "2026-03-05" },
+            { name: "RootUser_01", score: 850, grade: "B+", date: "2026-03-02" },
+            { name: "TechWizard", score: 720, grade: "B", date: "2026-02-15" }
+        ];
+    },
+
+    saveCurrentScore(grade) {
+        if (player.scoreSaved) return;
+
+        let board = this.loadLeaderboard();
+        const entry = {
+            name: player.name || "OPERATOR",
+            score: player.score,
+            grade: grade,
+            date: new Date().toISOString().split('T')[0],
+            isCurrent: true
+        };
+
+        board.push(entry);
+        board.sort((a, b) => b.score - a.score);
+        
+        // Keep top 10
+        board = board.slice(0, 10);
+
+        localStorage.setItem("scada_leaderboard", JSON.stringify(board));
+        player.scoreSaved = true;
+    },
 
     render() {
         const ui = document.getElementById("ui-layer");
@@ -45,6 +82,8 @@ const ResultsPhase = {
             headline = "VULNERABILITIES DETECTED: MINIMAL DEFENSE";
             headlineColor = "#ffae00";
         }
+
+        this.saveCurrentScore(grade);
 
         // 1. Headline (News style)
         const newsHeader = document.createElement("div");
@@ -169,6 +208,8 @@ const ResultsPhase = {
         panel.style.borderColor = "#ffae00";
         panel.style.boxShadow = "0 0 30px #ffae00";
 
+        const board = this.loadLeaderboard();
+
         let boardHtml = `
             <h1 style="color:#ffae00; letter-spacing: 5px; margin-bottom: 30px;">GLOBAL COMMANDER LEADERBOARD</h1>
             <table style="width:100%; border-collapse: collapse; color: white; font-size: 20px; text-align: left;">
@@ -180,12 +221,17 @@ const ResultsPhase = {
                 </tr>
         `;
 
-        this.leaderboard.forEach((entry, i) => {
+        board.forEach((entry, i) => {
             const isTop = i === 0;
+            const isCurrent = entry.isCurrent;
+            const rowStyle = isCurrent 
+                ? 'background: rgba(57, 255, 20, 0.2); color: #39ff14; font-weight: bold; border: 1px solid #39ff14;' 
+                : isTop ? 'background: rgba(255,174,0,0.1); color: #ffae00; font-weight: bold;' : '';
+
             boardHtml += `
-                <tr style="border-bottom: 1px solid rgba(255,174,0,0.2); ${isTop ? 'background: rgba(255,174,0,0.1); color: #ffae00; font-weight: bold;' : ''}">
+                <tr style="border-bottom: 1px solid rgba(255,174,0,0.2); ${rowStyle}">
                     <td style="padding: 15px;">#${i + 1}</td>
-                    <td>${entry.name} ${isTop ? '👑' : ''}</td>
+                    <td>${entry.name} ${isTop ? '👑' : ''} ${isCurrent ? '<span style="font-size:0.8em;">(YOU)</span>' : ''}</td>
                     <td>${entry.score.toString().padStart(6, '0')}</td>
                     <td>${entry.grade}</td>
                 </tr>

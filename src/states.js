@@ -113,5 +113,6 @@ window.player = {
     ids: 0,
     bcm: 0
   },
-  incidents: []
+  incidents: [],
+  scoreSaved: false
 };
