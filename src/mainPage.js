@@ -59,6 +59,28 @@ function renderMainPage(ctx, canvas) {
   // Hover feedback for system zones
   if (window.gameStarted && typeof systemZones !== 'undefined') {
     systemZones.forEach(zone => {
+      // 1. Alert Visualization
+      const activeAlert = (AlertManager.activeAlerts || []).find(a => a.zone === zone.name);
+      if (activeAlert) {
+        const flash = Math.abs(Math.sin(Date.now() / 200));
+        ctx.fillStyle = `rgba(255, 45, 68, ${0.2 + flash * 0.4})`; // Flashing Red
+        ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+        
+        ctx.strokeStyle = "#ff2d44";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+
+        // Alert Tag
+        ctx.fillStyle = "#ff2d44";
+        ctx.fillRect(zone.x, zone.y - 25, zone.w, 20);
+        ctx.fillStyle = "#000";
+        ctx.font = "bold 12px monospace";
+        ctx.textAlign = "center";
+        const timeLeft = Math.max(0, Math.ceil((activeAlert.expires - Date.now()) / 1000));
+        ctx.fillText(`!!! ATTACK IN PROGRESS: ${timeLeft}s !!!`, zone.x + zone.w / 2, zone.y - 10);
+      }
+
+      // 2. Hover Logic
       if (isInside(zone, window.mouseX, window.mouseY)) {
         ctx.strokeStyle = "rgba(57, 255, 20, 0.4)";
         ctx.lineWidth = 3;
@@ -75,11 +97,20 @@ function renderMainPage(ctx, canvas) {
     });
   }
 
-  ctx.fillStyle = "rgba(57, 255, 20, 0.9)";
-  ctx.font = "bold 32px monospace";
-  ctx.textAlign = "center";
-  ctx.shadowBlur = 15;
-  ctx.shadowColor = "#39ff14";
-  ctx.fillText("GRID STATUS: UNSTABLE - FIRMWARE TAMPERING DETECTED", canvas.width / 2, 180);
-  ctx.shadowBlur = 0;
+  if (!window.gameStarted) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#39ff14";
+    ctx.font = "bold 40px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(">>> PRESS [SPACE] TO INITIALIZE DEFENSE SYSTEMS <<<", canvas.width / 2, canvas.height / 2);
+  } else {
+    ctx.fillStyle = "rgba(57, 255, 20, 0.9)";
+    ctx.font = "bold 32px monospace";
+    ctx.textAlign = "center";
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#39ff14";
+    ctx.fillText("GRID STATUS: UNSTABLE - FIRMWARE TAMPERING DETECTED", canvas.width / 2, 180);
+    ctx.shadowBlur = 0;
+  }
 }

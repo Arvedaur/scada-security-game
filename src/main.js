@@ -20,11 +20,12 @@ window.debugStart = null;
 
 // Navigation Buttons (HUD)
 const navButtons = [
-    { id: "INV", label: "[ INVENTORY ]", state: GameState.ASSET_INVENTORY, x: 50, y: 20, w: 300, h: 60, color: "#39ff14" },
-    { id: "PATCH", label: "[ PATCH MGMT ]", state: GameState.PATCH_MGMT, x: 375, y: 20, w: 300, h: 60, color: "#39ff14" },
-    { id: "ACCESS", label: "[ ACCESS MGMT ]", state: GameState.ACCESS_MGMT, x: 700, y: 20, w: 300, h: 60, color: "#39ff14" },
-    { id: "IDS", label: "[ IDS MONITOR ]", state: GameState.IDS_MONITOR, x: 1025, y: 20, w: 300, h: 60, color: "#39ff14" },
-    { id: "BCM", label: "[ BCM / DR ]", state: GameState.BCM_DR, x: 1350, y: 20, w: 300, h: 60, color: "#39ff14" }
+    { id: "INV", label: "[ INVENTORY ]", state: GameState.ASSET_INVENTORY, x: 50, y: 20, w: 250, h: 60, color: "#39ff14" },
+    { id: "PATCH", label: "[ PATCH MGMT ]", state: GameState.PATCH_MGMT, x: 310, y: 20, w: 250, h: 60, color: "#39ff14" },
+    { id: "MAIL", label: "[ NET MAIL ]", state: GameState.PHISHING_SIM, x: 570, y: 20, w: 250, h: 60, color: "#39ff14" },
+    { id: "ACCESS", label: "[ ACCESS MGMT ]", state: GameState.ACCESS_MGMT, x: 830, y: 20, w: 250, h: 60, color: "#39ff14" },
+    { id: "IDS", label: "[ IDS MONITOR ]", state: GameState.IDS_MONITOR, x: 1090, y: 20, w: 250, h: 60, color: "#39ff14" },
+    { id: "BCM", label: "[ BCM / DR ]", state: GameState.BCM_DR, x: 1350, y: 20, w: 250, h: 60, color: "#39ff14" }
 ];
 
 const helpButton = { id: "HELP", x: 1680, y: 25, w: 50, h: 50 };
@@ -108,6 +109,88 @@ function isInside(obj, x, y) {
     return x >= obj.x && x <= obj.x + obj.w && y >= obj.y && y <= obj.y + obj.h;
 }
 
+// --- ALERTS & REACTIVE GAMEPLAY ---
+
+function updateAlerts() {
+    // Only update during active gameplay
+    const gameplayStates = [
+        GameState.MAIN_PAGE, GameState.SUBSTATION, GameState.WTG, GameState.BESS, 
+        GameState.SOLAR, GameState.OPGW, GameState.ASSET_INVENTORY,
+        GameState.PATCH_MGMT, GameState.ACCESS_MGMT, GameState.IDS_MONITOR, GameState.BCM_DR
+    ];
+    if (!window.gameStarted || !gameplayStates.includes(currentState)) return;
+
+    const now = Date.now();
+
+    // 0. Auto-Resolve if player is already in the correct phase
+    resolveAlertsForPhase(currentState);
+
+    // 1. Alert Generation
+    // Only SPAWN new alerts while on the main map or sector pages
+    const spawnStates = [GameState.MAIN_PAGE, GameState.SUBSTATION, GameState.WTG, GameState.BESS, GameState.SOLAR, GameState.OPGW];
+    if (spawnStates.includes(currentState) && now - AlertManager.lastSpawnTime > 7000 + Math.random() * 10000) {
+        if (AlertManager.activeAlerts.length < 2) { 
+            const availableTypes = ["ACCESS", "IDS"]; // Alarms can always happen for high tension
+
+            const randomZone = systemZones[Math.floor(Math.random() * systemZones.length)];
+            const type = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+            
+            const newAlert = {
+                id: "alert_" + now,
+                zone: randomZone.name,
+                type: type,
+                expires: now + 20000 + (Math.random() * 10000), // 20-30 seconds
+                notified: false
+            };
+
+            AlertManager.activeAlerts.push(newAlert);
+            showStatusMessage(`[!] SECURITY ALERT: ATTACK DETECTED IN ${newAlert.zone}. TYPE: ${newAlert.type}`, 5000);
+            AlertManager.lastSpawnTime = now;
+        }
+    }
+
+    // 2. Alert Expiration & Penalties
+    AlertManager.activeAlerts = AlertManager.activeAlerts.filter(alert => {
+        if (now > alert.expires) {
+            player.score = Math.max(0, player.score - 50);
+            showStatusMessage(`[!!!] SYSTEM COMPROMISED: ${alert.zone} INTEGRITY BREACHED. -50 PTS`, 5000);
+            player.incidents.push(`Integrity Breach in ${alert.zone}: Unresponded ${alert.type} Threat`);
+            return false;
+        }
+        return true;
+    });
+
+    // 3. UI Update (External Banner) - Using cached element
+    if (!AlertManager.bannerElement) {
+        AlertManager.bannerElement = document.getElementById("alert-banner");
+    }
+
+    if (AlertManager.bannerElement) {
+        if (AlertManager.activeAlerts.length > 0) {
+            AlertManager.bannerElement.classList.remove("hidden");
+            AlertManager.bannerElement.innerText = `🚨 EMERGENCY: ${AlertManager.activeAlerts.length} ACTIVE THREATS - RESPOND IMMEDIATELY 🚨`;
+        } else {
+            AlertManager.bannerElement.classList.add("hidden");
+        }
+    }
+}
+
+function resolveAlertsForPhase(phase) {
+    let alertFound = false;
+    AlertManager.activeAlerts = AlertManager.activeAlerts.filter(alert => {
+        const isMatch = (phase === GameState.IDS_MONITOR && alert.type === "IDS") ||
+                        (phase === GameState.ACCESS_MGMT && alert.type === "ACCESS");
+        
+        if (isMatch) {
+            player.score += 25;
+            showStatusMessage(`[+] THREAT MITIGATED: ATTACK BLOCKED IN ${alert.zone}. +25 PTS`, 4000);
+            alertFound = true;
+            return false;
+        }
+        return true;
+    });
+}
+
 // --- RENDERING ---
 
 function renderHUD() {
@@ -116,9 +199,22 @@ function renderHUD() {
     ctx.fillRect(0, 0, canvas.width, 94);
 
     // Glowing thick border for HUD
-    ctx.strokeStyle = "#39ff14";
-    ctx.lineWidth = 6;
-    ctx.strokeRect(10, 10, canvas.width - 20, 84);
+    const hasAlerts = (AlertManager.activeAlerts || []).length > 0;
+    if (hasAlerts) {
+        const flash = Math.abs(Math.sin(Date.now() / 150));
+        ctx.strokeStyle = `rgba(255, 45, 68, ${0.4 + flash * 0.6})`;
+        ctx.lineWidth = 8;
+        ctx.strokeRect(10, 10, canvas.width - 20, 84);
+        
+        ctx.fillStyle = "#ff2d44";
+        ctx.font = "bold 20px monospace";
+        ctx.textAlign = "left";
+        ctx.fillText("!!! CYBER-ATTACK IN PROGRESS !!!", 25, 35);
+    } else {
+        ctx.strokeStyle = "#39ff14";
+        ctx.lineWidth = 6;
+        ctx.strokeRect(10, 10, canvas.width - 20, 84);
+    }
 
     // Text (Operator & Score) positioned in Top Right
     ctx.font = "bold 20px monospace";
@@ -404,6 +500,7 @@ window.addEventListener("keydown", (e) => {
         if (e.code === "Space") {
             player.name = loginInput.trim() || "OPERATOR";
             currentState = GameState.MAIN_PAGE;
+            window.gameStarted = true; // Start game loop logic immediately
         } else if (e.key === "Backspace") {
             loginInput = loginInput.slice(0, -1);
         } else if (e.key.length === 1 && e.key !== " ") {
@@ -414,6 +511,22 @@ window.addEventListener("keydown", (e) => {
         if (e.code === "Space") {
             window.gameStarted = true;
         }
+    }
+
+    // --- DEBUG / TEST KEYS ---
+    if (e.key.toLowerCase() === 'k') {
+        // Force spawn an alert for testing
+        const randomZone = systemZones[Math.floor(Math.random() * systemZones.length)];
+        const type = Math.random() > 0.5 ? "IDS" : "ACCESS";
+        const newAlert = {
+            id: "alert_manual_" + Date.now(),
+            zone: randomZone.name,
+            type: type,
+            expires: Date.now() + 30000,
+            notified: false
+        };
+        AlertManager.activeAlerts.push(newAlert);
+        showStatusMessage(`[TEST] MANUAL ALARM TRIGGERED: ${type} AT ${newAlert.zone}`, 5000);
     }
 
     // Copy Coordinates to Clipboard when 'C' is pressed
@@ -491,17 +604,29 @@ canvas.addEventListener("click", (e) => {
                     showStatusMessage("ERROR: ASSET INVENTORY REQUIRED BEFORE PATCHING");
                     return;
                 }
-                if (btn.id === "ACCESS" && !player.progress.patching) {
+                if (btn.id === "MAIL" && !player.progress.patching) {
                     showStatusMessage("ERROR: PATCHING PHASE MUST BE COMPLETED FIRST");
                     return;
+                }
+                if (btn.id === "ACCESS" && !player.progress.phishing) {
+                    const hasAccessAlert = AlertManager.activeAlerts.some(a => a.type === "ACCESS");
+                    if (!hasAccessAlert) {
+                        showStatusMessage("ERROR: NET MAIL (PHISHING) PHASE MUST BE COMPLETED FIRST");
+                        return;
+                    }
+                    // If alert exists, allow entry for emergency response
                 }
                 if (btn.id === "BCM" && !player.progress.ids) {
                     showStatusMessage("ERROR: IDS MONITORING REQUIRED BEFORE DISASTER PLANNING");
                     return;
                 }
                 if (btn.id === "IDS" && !player.progress.access) {
-                    showStatusMessage("ERROR: ACCESS CONTROL MUST BE SECURED FIRST");
-                    return;
+                    const hasIdsAlert = AlertManager.activeAlerts.some(a => a.type === "IDS");
+                    if (!hasIdsAlert) {
+                        showStatusMessage("ERROR: ACCESS CONTROL MUST BE SECURED FIRST");
+                        return;
+                    }
+                    // If alert exists, allow entry for emergency response
                 }
 
                 // Lock navigation if in a mandatory phase and not finished
@@ -519,6 +644,7 @@ canvas.addEventListener("click", (e) => {
 
                 if (btn.state) {
                     currentState = btn.state;
+                    resolveAlertsForPhase(currentState);
                     if (btn.id === "IDS") IDSPhase.init();
                     navClicked = true;
                 }
@@ -572,7 +698,9 @@ canvas.addEventListener("click", (e) => {
 const DOM_STATES = [
     GameState.ASSET_INVENTORY,
     GameState.PATCH_MGMT,
+    GameState.PHISHING_SIM,
     GameState.ACCESS_MGMT,
+    GameState.IDS_MONITOR,
     GameState.BCM_DR,
     GameState.RESULTS
 ];
@@ -580,6 +708,9 @@ const DOM_STATES = [
 let lastState = null;
 
 function gameLoop() {
+    // 0. Update Logic
+    updateAlerts();
+
     // 1. State Transition Handling (Run once per state change)
     if (currentState !== lastState) {
         // Exit Logic
@@ -598,6 +729,10 @@ function gameLoop() {
                 case GameState.PATCH_MGMT:
                     if (!PatchingPhase.initialized) { PatchingPhase.init(); PatchingPhase.initialized = true; }
                     PatchingPhase.render();
+                    break;
+                case GameState.PHISHING_SIM:
+                    if (!PhishingPhase.initialized) { PhishingPhase.init(); PhishingPhase.initialized = true; }
+                    PhishingPhase.render();
                     break;
                 case GameState.ACCESS_MGMT:
                     if (!AccessPhase.initialized) { AccessPhase.init(); AccessPhase.initialized = true; }

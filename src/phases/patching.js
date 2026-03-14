@@ -310,10 +310,10 @@ const PatchingPhase = {
 
     finishPhase() {
         player.progress.patching = true;
-        showStatusMessage("ALL ASSETS PROCESSED. MOVING TO ACCESS CONTROL...", 4000);
+        showStatusMessage("ALL ASSETS PROCESSED. INCOMING EMAIL ALERT...", 4000);
         setTimeout(() => {
-            currentState = GameState.ACCESS_MGMT;
+            currentState = GameState.PHISHING_SIM;
             document.getElementById("ui-layer").classList.add("hidden");
-        }, 1000);
+        }, 1500);
     }
 };

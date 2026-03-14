@@ -235,3 +235,28 @@ canvas {
     color: var(--retro-green);
     background: transparent;
 }
+
+#alert-banner {
+    position: absolute;
+    top: 94px;
+    left: 10px;
+    right: 10px;
+    height: 60px;
+    background: #ff2d44;
+    border: 3px solid #fff;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    z-index: 1000;
+    pointer-events: none;
+    animation: alert-flash 0.5s infinite;
+}
+
+@keyframes alert-flash {
+    0% { opacity: 0.7; }
+    50% { opacity: 1.0; }
+    100% { opacity: 0.7; }
+}

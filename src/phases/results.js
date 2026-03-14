@@ -85,6 +85,17 @@ const ResultsPhase = {
 
         this.saveCurrentScore(grade);
 
+        // Helper for staggered animation
+        const animateEntry = (el, delay) => {
+            el.style.opacity = "0";
+            el.style.transform = "translateY(20px)";
+            el.style.transition = "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+            setTimeout(() => {
+                el.style.opacity = "1";
+                el.style.transform = "translateY(0)";
+            }, delay);
+        };
+
         // 1. Headline (News style)
         const newsHeader = document.createElement("div");
         newsHeader.style.background = headlineColor;
@@ -95,6 +106,7 @@ const ResultsPhase = {
         newsHeader.style.marginBottom = "20px";
         newsHeader.innerText = headline;
         panel.appendChild(newsHeader);
+        animateEntry(newsHeader, 100);
 
         // 2. Main Stats
         const mainStats = document.createElement("div");
@@ -109,6 +121,7 @@ const ResultsPhase = {
             </div>
         `;
         panel.appendChild(mainStats);
+        animateEntry(mainStats, 600);
 
         // 3. Score Breakdown (Detailed)
         const breakdown = document.createElement("div");
@@ -123,6 +136,7 @@ const ResultsPhase = {
         const idsStats = player.idsStats || { blocked: 0, missed: 0, correctDecisions: 0, falsePos: 0 };
         const accStats = player.accessStats || { correct: 0, incorrect: 0 };
         const bcmStats = player.bcmStats || { strong: 0, weak: 0, paper: 0 };
+        const phishStats = player.phishingStats || { caught: 0, missed: 0, falsePositives: 0 };
 
         breakdown.innerHTML = `
             <h2 style="color:#39ff14; margin-top:0; border-bottom: 2px solid #39ff14;">OPERATIONAL ACHIEVEMENTS:</h2>
@@ -134,18 +148,23 @@ const ResultsPhase = {
                     <p style="margin:5px 0;">- Remediation: ${player.phaseScores.patching} PTS</p>
                 </div>
                 <div>
-                    <h3 style="color:#00fbff;">[2] ACCESS CONTROL</h3>
-                    <p style="margin:5px 0;">- Valid Approvals/Denies: ${accStats.correct}</p>
-                    <p style="margin:5px 0;">- Security Violations: ${accStats.incorrect}</p>
+                    <h3 style="color:#00fbff;">[3] EMAIL SECURITY</h3>
+                    <p style="margin:5px 0;">- Phishing Caught: ${phishStats.caught}</p>
+                    <p style="margin:5px 0;">- Attacks Missed: ${phishStats.missed}</p>
+                    <p style="margin:5px 0;">- False Positives: ${phishStats.falsePositives}</p>
                 </div>
                 <div>
-                    <h3 style="color:#00fbff;">[3] IDS MONITORING</h3>
+                    <h3 style="color:#00fbff;">[4] ACCESS CONTROL</h3>
+                    <p style="margin:5px 0;">- Valid Reviews: ${accStats.correct}</p>
+                    <p style="margin:5px 0;">- Security Slips: ${accStats.incorrect}</p>
+                </div>
+                <div>
+                    <h3 style="color:#00fbff;">[5] IDS MONITORING</h3>
                     <p style="margin:5px 0;">- Threats Detained: ${idsStats.blocked}</p>
-                    <p style="margin:5px 0;">- Traffic Decisions: ${idsStats.correctDecisions}</p>
                     <p style="margin:5px 0;">- False Positives: ${idsStats.falsePos}</p>
                 </div>
                 <div>
-                    <h3 style="color:#00fbff;">[4] DISASTER RECOVERY</h3>
+                    <h3 style="color:#00fbff;">[6] DISASTER RECOVERY</h3>
                     <p style="margin:5px 0;">- Resilient Backups: ${bcmStats.strong}</p>
                     <p style="margin:5px 0;">- Weak Points: ${bcmStats.weak}</p>
                 </div>
@@ -157,6 +176,7 @@ const ResultsPhase = {
             </div>
         `;
         panel.appendChild(breakdown);
+        animateEntry(breakdown, 1100);
 
         // 4. Actions
         const actions = document.createElement("div");
@@ -193,6 +213,7 @@ const ResultsPhase = {
         actions.appendChild(leaderBtn);
         actions.appendChild(restartBtn);
         panel.appendChild(actions);
+        animateEntry(actions, 1600);
 
         ui.appendChild(panel);
     },
@@ -256,6 +277,7 @@ const ResultsPhase = {
         const idsStats = player.idsStats || { blocked: 0, missed: 0, correctDecisions: 0, falsePos: 0 };
         const accStats = player.accessStats || { correct: 0, incorrect: 0 };
         const bcmStats = player.bcmStats || { strong: 0, weak: 0, paper: 0 };
+        const phishStats = player.phishingStats || { caught: 0, missed: 0, falsePositives: 0 };
 
         // Generate QR Code data (Just a summary URL/String)
         const qrData = encodeURIComponent(`Operator:${player.name}|Score:${player.score}|Grade:${grade}|Date:${dateStr}`);
@@ -305,8 +327,13 @@ const ResultsPhase = {
                             <p>Correct Logic: ${idsStats.correctDecisions}</p>
                         </div>
                         <div class="stat-box">
+                            <h4>NET MAIL (PHISHING)</h4>
+                            <p>Phishing Caught: ${phishStats.caught}</p>
+                            <p>Attacks Missed: ${phishStats.missed}</p>
+                        </div>
+                        <div class="stat-box">
                             <h4>ACCESS CONTROL</h4>
-                            <p>Correct Reviews: ${accStats.correct}</p>
+                            <p>Valid Reviews: ${accStats.correct}</p>
                             <p>Security Slips: ${accStats.incorrect}</p>
                         </div>
                         <div class="stat-box">

@@ -12,6 +12,7 @@ const GameState = {
   ASSET_INVENTORY: "ASSET_INVENTORY",
   PATCH_MGMT: "PATCH_MGMT",
   ACCESS_MGMT: "ACCESS_MGMT",
+  PHISHING_SIM: "PHISHING_SIM",
   IDS_MONITOR: "IDS_MONITOR",
   BCM_DR: "BCM_DR",
   OPGW: "OPGW",
@@ -96,6 +97,11 @@ window.mouseX = 0;
 window.mouseY = 0;
 window.loginInput = "";
 window.gameStarted = false; // NEW FLAG
+window.AlertManager = {
+  activeAlerts: [],
+  lastSpawnTime: 0,
+  bannerElement: null
+};
 
 window.player = {
   name: "",
@@ -104,11 +110,14 @@ window.player = {
   progress: {
     inventory: false,
     patching: false,
-    access: false
+    phishing: false,
+    access: false,
+    ids: false
   },
   phaseScores: {
     inventory: 0,
     patching: 0,
+    phishing: 0,
     access: 0,
     ids: 0,
     bcm: 0
